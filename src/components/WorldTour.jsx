@@ -1,36 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import toursData from '../data/tours.json'
-
-// Loading Screen Component - iOS Style
-const LoadingView = () => {
-  const [isAnimating, setIsAnimating] = useState(false)
-
-  useEffect(() => {
-    setIsAnimating(true)
-  }, [])
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-blue-100 to-orange-50 flex items-center justify-center">
-      <div className="text-center space-y-8 animate-fade-in">
-        {/* Animated Globe Icon */}
-        <div className={`text-8xl text-blue-500 transition-all duration-2000 ${isAnimating ? 'scale-110 animate-bounce-gentle' : 'scale-100'}`}>
-          🌍
-        </div>
-        
-        {/* App Name with Fade-in Animation */}
-        <h1 className={`text-5xl font-bold text-gray-800 transition-all duration-1000 ${isAnimating ? 'opacity-100 animate-slide-up' : 'opacity-0'}`}>
-          World Tour
-        </h1>
-        
-        {/* Loading Spinner */}
-        <div className={`flex justify-center transition-all duration-1000 ${isAnimating ? 'opacity-100 animate-pulse-slow' : 'opacity-0'}`}>
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
-        </div>
-      </div>
-    </div>
-  )
-}
+import LoadingScreen from './LoadingScreen'
 
 // Home View Component - iOS Style
 const HomeView = ({ locationManager, onStartTour, onOpenSettings }) => {
@@ -476,21 +447,17 @@ const WorldTour = () => {
     setCurrentView('settings')
   }
 
+  // Handle loading complete
+  const handleLoadingComplete = () => {
+    setIsLoading(false)
+  }
+
   // Location manager object for components
   const locationManager = {
     isMonitoring,
     isLocationEnabled,
     activePOI: nearbyPOI
   }
-
-  useEffect(() => {
-    // Simulate loading time
-    const timer = setTimeout(() => {
-      setIsLoading(false)
-    }, 3000)
-
-    return () => clearTimeout(timer)
-  }, [])
 
   useEffect(() => {
     return () => {
@@ -502,7 +469,7 @@ const WorldTour = () => {
   }, [])
 
   if (isLoading) {
-    return <LoadingView />
+    return <LoadingScreen onComplete={handleLoadingComplete} />
   }
 
   if (currentView === 'settings') {
