@@ -14,14 +14,14 @@ function App() {
         <Routes>
           <Route path="/" element={
             <div className="flex flex-col h-screen">
-              {/* Main Content */}
+              {/* Main Content - iOS Style Updated */}
               <div className="flex-1 overflow-hidden">
                 {currentTab === 'home' && <WorldTour />}
                 {currentTab === 'past-tours' && <PastTours />}
                 {currentTab === 'tours' && <Tours />}
               </div>
 
-              {/* Tab Navigation - iOS Style Updated */}
+              {/* Tab Navigation - iOS Style Updated - FORCE DEPLOYMENT */}
               <div className="bg-white border-t border-gray-200 px-4 py-2">
                 <div className="flex justify-around">
                   <button
@@ -33,7 +33,7 @@ function App() {
                     }`}
                   >
                     <span className="text-xl mb-1">🏠</span>
-                    <span className="text-xs font-medium">Home</span>
+                    <span className="text-xs font-medium">Home - iOS</span>
                   </button>
                   
                   <button
@@ -45,7 +45,7 @@ function App() {
                     }`}
                   >
                     <span className="text-xl mb-1">🌍</span>
-                    <span className="text-xs font-medium">Tours</span>
+                    <span className="text-xs font-medium">Tours - iOS</span>
                   </button>
                   
                   <button
@@ -57,7 +57,7 @@ function App() {
                     }`}
                   >
                     <span className="text-xl mb-1">📋</span>
-                    <span className="text-xs font-medium">History</span>
+                    <span className="text-xs font-medium">History - iOS</span>
                   </button>
                 </div>
               </div>

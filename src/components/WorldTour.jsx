@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import toursData from '../data/tours.json'
 
-// Loading Screen Component - iOS Style v2.0
+// Loading Screen Component - iOS Style v2.0 - DEPLOYMENT FORCE
 const LoadingView = () => {
   const [isAnimating, setIsAnimating] = useState(false)
 
@@ -13,14 +13,14 @@ const LoadingView = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-blue-100 to-orange-50 flex items-center justify-center">
       <div className="text-center space-y-8">
-        {/* Animated Globe Icon */}
+        {/* Animated Globe Icon - FORCE DEPLOYMENT */}
         <div className={`text-8xl text-blue-500 transition-all duration-2000 ${isAnimating ? 'scale-110' : 'scale-100'}`}>
           🌍
         </div>
         
         {/* App Name with Fade-in Animation */}
         <h1 className={`text-5xl font-bold text-gray-800 transition-all duration-1000 ${isAnimating ? 'opacity-100' : 'opacity-0'}`}>
-          World Tour
+          World Tour - iOS Style
         </h1>
         
         {/* Loading Spinner */}
@@ -32,7 +32,7 @@ const LoadingView = () => {
   )
 }
 
-// Home View Component - iOS Style v2.0
+// Home View Component - iOS Style v2.0 - DEPLOYMENT FORCE
 const HomeView = ({ locationManager, onStartTour, onOpenSettings }) => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-blue-100 to-orange-50">
@@ -46,11 +46,11 @@ const HomeView = ({ locationManager, onStartTour, onOpenSettings }) => {
         </button>
 
         <div className="text-center space-y-12 mb-12">
-          {/* Large Globe Icon */}
+          {/* Large Globe Icon - FORCE DEPLOYMENT */}
           <div className="text-8xl text-blue-500 mb-6">🌍</div>
           
           {/* App Title */}
-          <h1 className="text-5xl font-bold text-gray-800">World Tour</h1>
+          <h1 className="text-5xl font-bold text-gray-800">World Tour - iOS Style</h1>
         </div>
 
         {/* Location Status - iOS Style */}
