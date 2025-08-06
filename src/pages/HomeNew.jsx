@@ -139,7 +139,11 @@ const HomeNew = () => {
         longitude: -73.9857
       }
       setUserLocation(mockUserLocation)
-      updatePOIStatus(mockUserLocation.latitude, mockUserLocation.longitude)
+      
+      // Only update POI status if POIs are loaded
+      if (pois.length > 0) {
+        updatePOIStatus(mockUserLocation.latitude, mockUserLocation.longitude)
+      }
     }, 2000)
 
     const poiTimer = setTimeout(() => {
@@ -150,11 +154,18 @@ const HomeNew = () => {
       clearTimeout(locationTimer)
       clearTimeout(poiTimer)
     }
-  }, [pois]) // Add pois as dependency
+  }, []) // Remove pois dependency to ensure location simulation always runs
+
+  // Update POI status when POIs are loaded
+  useEffect(() => {
+    if (locationEnabled && userLocation && pois.length > 0) {
+      updatePOIStatus(userLocation.latitude, userLocation.longitude)
+    }
+  }, [pois, locationEnabled, userLocation])
 
   // Real-time location updates (simulated)
   useEffect(() => {
-    if (!locationEnabled || !userLocation || pois.length === 0) return
+    if (!locationEnabled || !userLocation) return
 
     const locationUpdateInterval = setInterval(() => {
       // Simulate user movement
@@ -163,7 +174,11 @@ const HomeNew = () => {
       const newLocation = { latitude: newLat, longitude: newLon }
       
       setUserLocation(newLocation)
-      updatePOIStatus(newLat, newLon)
+      
+      // Only update POI status if POIs are loaded
+      if (pois.length > 0) {
+        updatePOIStatus(newLat, newLon)
+      }
     }, 5000) // Update every 5 seconds
 
     return () => clearInterval(locationUpdateInterval)
@@ -225,8 +240,10 @@ const HomeNew = () => {
   }
 
   const LocationStatusPanel = () => {
+    // Show location request if location is not enabled, regardless of POI loading state
     if (!locationEnabled) return null
 
+    // Show loading state for POIs
     if (poisLoading) {
       return (
         <motion.div
@@ -249,6 +266,7 @@ const HomeNew = () => {
       )
     }
 
+    // Show error state for POIs
     if (poisError) {
       return (
         <motion.div
@@ -271,6 +289,7 @@ const HomeNew = () => {
       )
     }
 
+    // Show detecting state
     if (isDetecting) {
       return (
         <motion.div
@@ -301,6 +320,7 @@ const HomeNew = () => {
       )
     }
 
+    // Show active POI if within range
     if (activePOI) {
       return (
         <motion.div
@@ -349,6 +369,7 @@ const HomeNew = () => {
       )
     }
 
+    // Show closest POI if out of range
     if (closestPOI) {
       const distanceInFeet = metersToFeet(closestPOI.distance)
       
@@ -389,6 +410,32 @@ const HomeNew = () => {
                     <span className="text-gray-500 text-sm font-medium">Keep walking to start the tour</span>
                   </div>
                 </motion.div>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      )
+    }
+
+    // Show no POIs available state
+    if (pois.length === 0 && !poisLoading && !poisError) {
+      return (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
+          className="w-full max-w-sm"
+        >
+          <Card className="bg-white/80 backdrop-blur-sm border-white/30 shadow-lg">
+            <CardContent className="p-6">
+              <div className="text-center space-y-4">
+                <div className="flex items-center justify-center space-x-2">
+                  <MapPin className="text-gray-500 w-5 h-5" />
+                  <span className="text-gray-600 font-medium">No POIs Available</span>
+                </div>
+                <p className="text-gray-500 text-sm">
+                  No points of interest are currently available in your area.
+                </p>
               </div>
             </CardContent>
           </Card>
