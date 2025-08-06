@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { BiX, BiMicrophone, BiVolumeFull, BiCloudOff, BiInfoCircle } from 'react-icons/bi'
+import { BiX, BiMicrophone, BiVolumeFull, BiWifiOff, BiInfoCircle } from 'react-icons/bi'
 
 const Settings = ({ onClose }) => {
   const [voiceGender, setVoiceGender] = useState('neutral')
@@ -161,13 +161,13 @@ const Settings = ({ onClose }) => {
             {/* App Settings */}
             <div className="space-y-4">
               <h3 className="text-lg font-semibold text-gray-800 flex items-center space-x-2">
-                <BiCloudOff className="text-purple-500" />
+                <BiWifiOff className="text-purple-500" />
                 <span>App Settings</span>
               </h3>
               
               <div className="bg-gray-50/50 rounded-2xl overflow-hidden">
                 <SettingItem
-                  icon={<BiCloudOff className="text-purple-500 text-lg" />}
+                  icon={<BiWifiOff className="text-purple-500 text-lg" />}
                   title="Offline Mode"
                   description="Use downloaded content only"
                 >
