@@ -4,6 +4,7 @@ import WorldTour from './components/WorldTour'
 import PastTours from './components/PastTours'
 import Tours from './components/Tours'
 import About from './components/About'
+import Home from './pages/Home'
 
 function App() {
   const [currentTab, setCurrentTab] = useState('home')
@@ -16,7 +17,7 @@ function App() {
             <div className="flex flex-col h-screen">
               {/* Main Content - iOS Style */}
               <div className="flex-1 overflow-hidden">
-                {currentTab === 'home' && <WorldTour />}
+                {currentTab === 'home' && <Home />}
                 {currentTab === 'past-tours' && <PastTours />}
                 {currentTab === 'tours' && <Tours />}
               </div>
