@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="World Tour">
+    <meta name="theme-color" content="#007AFF">
+    <title>World Tour</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'system': ['-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
+                    },
+                    colors: {
+                        'ios-blue': '#007AFF',
+                        'ios-gray': '#8E8E93',
+                        'ios-light-gray': '#F2F2F7',
+                        'ios-dark-gray': '#1C1C1E',
+                    },
+                    spacing: {
+                        '18': '4.5rem',
+                        '88': '22rem',
+                    },
+                    borderRadius: {
+                        'xl': '1rem',
+                        '2xl': '1.5rem',
+                    },
+                    boxShadow: {
+                        'ios': '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
+                        'ios-lg': '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        html {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #F2F2F7;
+            color: #1C1C1E;
+            overflow-x: hidden;
+        }
+        
+        * {
+            box-sizing: border-box;
+        }
+        
+        .btn-primary {
+            @apply bg-ios-blue text-white font-semibold py-4 px-6 rounded-xl shadow-ios-lg 
+                   hover:bg-blue-600 active:bg-blue-700 transition-colors duration-200 
+                   min-h-[48px] min-w-[48px] flex items-center justify-center;
+        }
+        
+        .btn-secondary {
+            @apply bg-white text-ios-blue font-semibold py-4 px-6 rounded-xl shadow-ios 
+                   border border-gray-200 hover:bg-gray-50 active:bg-gray-100 
+                   transition-colors duration-200 min-h-[48px] min-w-[48px] 
+                   flex items-center justify-center;
+        }
+        
+        .card {
+            @apply bg-white rounded-2xl shadow-ios-lg p-6 mx-4 mb-4;
+        }
+        
+        .loading-spinner {
+            @apply animate-spin rounded-full h-8 w-8 border-b-2 border-ios-blue;
+        }
+        
+        ::-webkit-scrollbar {
+            width: 0px;
+            background: transparent;
+        }
+        
+        button {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        
+        button:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.3);
+        }
+        
+        input, textarea, select {
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <!-- Header -->
+        <header class="bg-white shadow-ios px-4 py-6">
+            <div class="flex items-center justify-between">
+                <h1 class="text-2xl font-bold text-ios-dark-gray">World Tour</h1>
+                <button onclick="showAbout()" class="text-ios-blue font-medium text-lg">
+                    About
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="px-4 py-6">
+            <!-- Location Status -->
+            <div class="mb-6">
+                <div id="locationStatus" class="card">
+                    <div class="flex items-center justify-center space-x-3">
+                        <div class="loading-spinner"></div>
+                        <span class="text-lg text-ios-gray">Getting your location...</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Nearby POI Card -->
+            <div id="poiCard" class="hidden">
+                <div class="card">
+                    <h3 id="poiName" class="text-xl font-bold text-ios-dark-gray mb-3"></h3>
+                    <p id="poiPreview" class="text-ios-gray mb-6 leading-relaxed"></p>
+                    
+                    <div class="space-y-3">
+                        <button
+                            id="playButton"
+                            onclick="togglePlay()"
+                            class="btn-primary w-full"
+                            aria-label="Play tour audio"
+                        >
+                            Play Tour
+                        </button>
+                        
+                        <button
+                            id="repeatButton"
+                            onclick="repeatTour()"
+                            class="btn-secondary w-full hidden"
+                            aria-label="Repeat tour audio"
+                        >
+                            Repeat
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- No nearby tours message -->
+            <div id="noToursMessage" class="hidden">
+                <div class="card">
+                    <div class="text-center py-8">
+                        <p class="text-lg text-ios-gray mb-4">
+                            No nearby tours at this time.
+                        </p>
+                        <p class="text-sm text-ios-gray">
+                            Move closer to a tour location or try a different area.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Development Controls -->
+            <div class="mt-8">
+                <div class="card">
+                    <h3 class="text-lg font-semibold text-ios-dark-gray mb-3">
+                        Development Controls
+                    </h3>
+                    <div class="space-y-3">
+                        <button
+                            onclick="simulateLocation()"
+                            id="simulateButton"
+                            class="btn-secondary w-full"
+                            aria-label="Simulate location near Times Square"
+                        >
+                            Simulate Location (Times Square)
+                        </button>
+                        
+                        <button
+                            onclick="getRealLocation()"
+                            class="btn-secondary w-full"
+                            aria-label="Get real location"
+                        >
+                            Get Real Location
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- About Modal -->
+        <div id="aboutModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50">
+            <div class="min-h-screen bg-ios-light-gray">
+                <header class="bg-white shadow-ios px-4 py-6">
+                    <div class="flex items-center justify-between">
+                        <button onclick="hideAbout()" class="text-ios-blue font-medium text-lg">
+                            ← Back
+                        </button>
+                        <h1 class="text-2xl font-bold text-ios-dark-gray">About</h1>
+                        <div class="w-8"></div>
+                    </div>
+                </header>
+
+                <main class="px-4 py-6">
+                    <div class="card">
+                        <h2 class="text-xl font-bold text-ios-dark-gray mb-4">
+                            World Tour App
+                        </h2>
+                        
+                        <div class="space-y-4 text-ios-gray leading-relaxed">
+                            <p>
+                                World Tour is a location-based audio tour app that provides immersive 
+                                experiences at famous landmarks and points of interest around the world.
+                            </p>
+                            
+                            <p>
+                                The app uses your device's GPS to detect when you're within 50 meters 
+                                of a tour location and automatically presents you with an audio tour 
+                                that you can play through your headphones.
+                            </p>
+                            
+                            <h3 class="text-lg font-semibold text-ios-dark-gray mt-6 mb-2">
+                                How it works:
+                            </h3>
+                            
+                            <ul class="list-disc list-inside space-y-2 ml-4">
+                                <li>Allow location access when prompted</li>
+                                <li>Move within 50 meters of a tour location</li>
+                                <li>Tap "Play Tour" to hear the audio narration</li>
+                                <li>Use "Repeat" to hear the tour again</li>
+                            </ul>
+                            
+                            <h3 class="text-lg font-semibold text-ios-dark-gray mt-6 mb-2">
+                                Features:
+                            </h3>
+                            
+                            <ul class="list-disc list-inside space-y-2 ml-4">
+                                <li>Location-based tour discovery</li>
+                                <li>High-quality audio narration</li>
+                                <li>Mobile-optimized interface</li>
+                                <li>Accessibility-friendly design</li>
+                                <li>Works offline with cached tour data</li>
+                            </ul>
+                            
+                            <div class="mt-6 p-4 bg-ios-light-gray rounded-xl">
+                                <h4 class="font-semibold text-ios-dark-gray mb-2">
+                                    Development Mode:
+                                </h4>
+                                <p class="text-sm">
+                                    Use the "Simulate Location" button on the main screen to test the app 
+                                    without being physically at a tour location.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tour data
+        const toursData = {
+            "pois": [
+                {
+                    "id": "1",
+                    "poiName": "Central Park Fountain",
+                    "latitude": 40.7829,
+                    "longitude": -73.9654,
+                    "script": "Welcome to Central Park's iconic fountain. This beautiful landmark has been a gathering place for New Yorkers since 1873. The fountain's cascading waters create a peaceful atmosphere in the heart of the city. On warm days, you'll see children playing in the water and couples taking romantic strolls around the fountain's base. The surrounding area is perfect for people-watching and enjoying the natural beauty of Central Park.",
+                    "preview": "Welcome to Central Park's iconic fountain. This beautiful landmark has been a gathering place for New Yorkers since 1873."
+                },
+                {
+                    "id": "2",
+                    "poiName": "Times Square",
+                    "latitude": 40.7580,
+                    "longitude": -73.9855,
+                    "script": "You're standing in the heart of Times Square, the crossroads of the world. This iconic intersection is famous for its bright neon signs, Broadway theaters, and the annual New Year's Eve ball drop. Times Square was once known as Longacre Square until the New York Times moved its headquarters here in 1904. Today, it's one of the most visited tourist attractions in the world, with over 50 million visitors annually. The energy here is electric, especially at night when all the billboards light up the sky.",
+                    "preview": "You're standing in the heart of Times Square, the crossroads of the world. This iconic intersection is famous for its bright neon signs."
+                },
+                {
+                    "id": "3",
+                    "poiName": "Brooklyn Bridge",
+                    "latitude": 40.7061,
+                    "longitude": -73.9969,
+                    "script": "The Brooklyn Bridge, completed in 1883, was the first steel-wire suspension bridge ever constructed. It spans the East River, connecting Manhattan and Brooklyn. At the time of its completion, it was the longest suspension bridge in the world. The bridge's distinctive Gothic arches and cable-stayed design make it one of New York's most recognizable landmarks. Walking across the pedestrian path offers spectacular views of the Manhattan skyline and the Statue of Liberty in the distance.",
+                    "preview": "The Brooklyn Bridge, completed in 1883, was the first steel-wire suspension bridge ever constructed. It spans the East River."
+                },
+                {
+                    "id": "4",
+                    "poiName": "Statue of Liberty",
+                    "latitude": 40.6892,
+                    "longitude": -74.0445,
+                    "script": "The Statue of Liberty, a gift from France to the United States, has welcomed immigrants and visitors to New York Harbor since 1886. Standing 305 feet tall, Lady Liberty represents freedom and democracy. The statue's torch symbolizes enlightenment, while the broken chains at her feet represent freedom from oppression. The seven spikes on her crown represent the seven continents and seas. This iconic symbol of American values continues to inspire millions of visitors each year.",
+                    "preview": "The Statue of Liberty, a gift from France to the United States, has welcomed immigrants and visitors to New York Harbor since 1886."
+                },
+                {
+                    "id": "5",
+                    "poiName": "Empire State Building",
+                    "latitude": 40.7484,
+                    "longitude": -73.9857,
+                    "script": "The Empire State Building, completed in 1931, was the world's tallest building for nearly 40 years. This Art Deco masterpiece stands 1,454 feet tall and has 102 floors. The building's distinctive design features setbacks that were required by zoning laws to allow sunlight to reach the streets below. The observation deck on the 86th floor offers breathtaking 360-degree views of New York City. At night, the building's lights change colors to celebrate various holidays and events.",
+                    "preview": "The Empire State Building, completed in 1931, was the world's tallest building for nearly 40 years. This Art Deco masterpiece stands 1,454 feet tall."
+                }
+            ]
+        };
+
+        let currentPOI = null;
+        let isPlaying = false;
+        let currentSpeech = null;
+
+        // Calculate distance between two coordinates in meters
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371e3; // Earth's radius in meters
+            const φ1 = lat1 * Math.PI / 180;
+            const φ2 = lat2 * Math.PI / 180;
+            const Δφ = (lat2 - lat1) * Math.PI / 180;
+            const Δλ = (lon2 - lon1) * Math.PI / 180;
+
+            const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+                      Math.cos(φ1) * Math.cos(φ2) *
+                      Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+            return R * c;
+        }
+
+        // Find the closest POI within 50 meters
+        function findNearbyPOI(userLat, userLon) {
+            let closestPOI = null;
+            let minDistance = Infinity;
+
+            toursData.pois.forEach(poi => {
+                const distance = calculateDistance(userLat, userLon, poi.latitude, poi.longitude);
+                if (distance <= 50 && distance < minDistance) {
+                    minDistance = distance;
+                    closestPOI = { ...poi, distance: Math.round(distance) };
+                }
+            });
+
+            return closestPOI;
+        }
+
+        // Update UI based on location status
+        function updateLocationStatus(status, message, showPOI = false) {
+            const locationStatus = document.getElementById('locationStatus');
+            const poiCard = document.getElementById('poiCard');
+            const noToursMessage = document.getElementById('noToursMessage');
+
+            if (status === 'loading') {
+                locationStatus.innerHTML = `
+                    <div class="flex items-center justify-center space-x-3">
+                        <div class="loading-spinner"></div>
+                        <span class="text-lg text-ios-gray">${message}</span>
+                    </div>
+                `;
+                locationStatus.classList.remove('hidden');
+                poiCard.classList.add('hidden');
+                noToursMessage.classList.add('hidden');
+            } else if (status === 'error') {
+                locationStatus.innerHTML = `
+                    <div class="text-center">
+                        <p class="text-lg text-red-600 mb-4">${message}</p>
+                        <button onclick="getRealLocation()" class="btn-primary" aria-label="Retry getting location">
+                            Try Again
+                        </button>
+                    </div>
+                `;
+                locationStatus.classList.remove('hidden');
+                poiCard.classList.add('hidden');
+                noToursMessage.classList.add('hidden');
+            } else if (status === 'success') {
+                locationStatus.innerHTML = `
+                    <h2 class="text-xl font-semibold text-ios-dark-gray mb-2">
+                        ${showPOI ? `You are near ${currentPOI.poiName}` : 'No nearby tours'}
+                    </h2>
+                    <p class="text-ios-gray">
+                        ${showPOI 
+                            ? `You're within ${currentPOI.distance} meters of this location.`
+                            : 'No tours are available within 50 meters of your current location.'
+                        }
+                    </p>
+                `;
+                locationStatus.classList.remove('hidden');
+                
+                if (showPOI) {
+                    poiCard.classList.remove('hidden');
+                    noToursMessage.classList.add('hidden');
+                    updatePOICard();
+                } else {
+                    poiCard.classList.add('hidden');
+                    noToursMessage.classList.remove('hidden');
+                }
+            }
+        }
+
+        // Update POI card
+        function updatePOICard() {
+            if (!currentPOI) return;
+            
+            document.getElementById('poiName').textContent = currentPOI.poiName;
+            document.getElementById('poiPreview').textContent = currentPOI.preview;
+            
+            const playButton = document.getElementById('playButton');
+            const repeatButton = document.getElementById('repeatButton');
+            
+            if (isPlaying) {
+                playButton.textContent = 'Stop Tour';
+                playButton.className = 'btn-secondary w-full';
+                repeatButton.classList.remove('hidden');
+            } else {
+                playButton.textContent = 'Play Tour';
+                playButton.className = 'btn-primary w-full';
+                repeatButton.classList.add('hidden');
+            }
+        }
+
+        // Get real location
+        function getRealLocation() {
+            updateLocationStatus('loading', 'Getting your location...');
+            
+            if (!navigator.geolocation) {
+                updateLocationStatus('error', 'Geolocation is not supported by this browser.');
+                return;
+            }
+
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const { latitude, longitude } = position.coords;
+                    currentPOI = findNearbyPOI(latitude, longitude);
+                    updateLocationStatus('success', '', !!currentPOI);
+                },
+                (error) => {
+                    let errorMessage = 'Unable to retrieve your location.';
+                    switch (error.code) {
+                        case error.PERMISSION_DENIED:
+                            errorMessage = 'Location access was denied. Please enable location services.';
+                            break;
+                        case error.POSITION_UNAVAILABLE:
+                            errorMessage = 'Location information is unavailable.';
+                            break;
+                        case error.TIMEOUT:
+                            errorMessage = 'Location request timed out.';
+                            break;
+                    }
+                    updateLocationStatus('error', errorMessage);
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 60000
+                }
+            );
+        }
+
+        // Simulate location
+        function simulateLocation() {
+            const simulateButton = document.getElementById('simulateButton');
+            simulateButton.textContent = 'Simulating...';
+            simulateButton.disabled = true;
+            
+            updateLocationStatus('loading', 'Simulating location...');
+            
+            setTimeout(() => {
+                // Simulate being near Times Square
+                const simulatedLocation = {
+                    latitude: 40.7580,
+                    longitude: -73.9855
+                };
+                
+                currentPOI = findNearbyPOI(simulatedLocation.latitude, simulatedLocation.longitude);
+                updateLocationStatus('success', '', !!currentPOI);
+                
+                simulateButton.textContent = 'Simulate Location (Times Square)';
+                simulateButton.disabled = false;
+            }, 1000);
+        }
+
+        // Play/Stop tour
+        function togglePlay() {
+            if (!currentPOI) return;
+
+            if (isPlaying) {
+                stopTour();
+            } else {
+                playTour();
+            }
+        }
+
+        // Play tour
+        function playTour() {
+            if (!currentPOI) return;
+
+            if (currentSpeech) {
+                window.speechSynthesis.cancel();
+            }
+
+            const utterance = new SpeechSynthesisUtterance(currentPOI.script);
+            utterance.rate = 0.9;
+            utterance.pitch = 1;
+            utterance.volume = 1;
+
+            utterance.onstart = () => {
+                isPlaying = true;
+                updatePOICard();
+            };
+            
+            utterance.onend = () => {
+                isPlaying = false;
+                updatePOICard();
+            };
+            
+            utterance.onerror = () => {
+                isPlaying = false;
+                updatePOICard();
+            };
+
+            currentSpeech = utterance;
+            window.speechSynthesis.speak(utterance);
+        }
+
+        // Stop tour
+        function stopTour() {
+            if (currentSpeech) {
+                window.speechSynthesis.cancel();
+                isPlaying = false;
+                updatePOICard();
+            }
+        }
+
+        // Repeat tour
+        function repeatTour() {
+            stopTour();
+            setTimeout(playTour, 100);
+        }
+
+        // Show about modal
+        function showAbout() {
+            document.getElementById('aboutModal').classList.remove('hidden');
+        }
+
+        // Hide about modal
+        function hideAbout() {
+            document.getElementById('aboutModal').classList.add('hidden');
+        }
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            getRealLocation();
+        });
+    </script>
+</body>
+</html> 

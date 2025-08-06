@@ -1,0 +1,59 @@
+{
+  "pois": [
+    {
+      "id": "empire-state",
+      "poiName": "Empire State Building",
+      "latitude": 40.7484,
+      "longitude": -73.9857,
+      "radius": 50,
+      "script": "Standing 1,454 feet tall, the Empire State Building is an Art Deco masterpiece and one of New York's most iconic landmarks. Completed in 1931, this skyscraper was once the world's tallest building for nearly 40 years. The building's distinctive design features setbacks that were required by zoning laws to allow sunlight to reach the streets below. The observation deck on the 86th floor offers breathtaking 360-degree views of New York City. At night, the building's lights change colors to celebrate various holidays and events. This architectural marvel continues to symbolize the ambition and innovation of New York City.",
+      "preview": "Standing 1,454 feet tall, the Empire State Building is an Art Deco masterpiece and one of New York's most iconic landmarks.",
+      "audioLength": 160,
+      "location": "New York, NY"
+    },
+    {
+      "id": "central-park",
+      "poiName": "Central Park",
+      "latitude": 40.7829,
+      "longitude": -73.9654,
+      "radius": 100,
+      "script": "A vast urban oasis covering 843 acres, Central Park offers lakes, walking trails, and cultural landmarks in the heart of Manhattan. This green sanctuary was designed by Frederick Law Olmsted and Calvert Vaux in the 1850s. The park features iconic landmarks like Bethesda Fountain, the Central Park Zoo, and the Great Lawn. On warm days, you'll see children playing in the water and couples taking romantic strolls. The surrounding area is perfect for people-watching and enjoying the natural beauty of this urban paradise. Central Park serves as the lungs of New York City, providing a peaceful escape from the bustling metropolis.",
+      "preview": "A vast urban oasis covering 843 acres, Central Park offers lakes, walking trails, and cultural landmarks in the heart of Manhattan.",
+      "audioLength": 240,
+      "location": "New York, NY"
+    },
+    {
+      "id": "times-square",
+      "poiName": "Times Square",
+      "latitude": 40.7580,
+      "longitude": -73.9855,
+      "radius": 75,
+      "script": "The bustling heart of Manhattan, Times Square is known for its bright lights, entertainment, and as the crossroads of the world. This iconic intersection is famous for its bright neon signs, Broadway theaters, and the annual New Year's Eve ball drop. Times Square was once known as Longacre Square until the New York Times moved its headquarters here in 1904. Today, it's one of the most visited tourist attractions in the world, with over 50 million visitors annually. The energy here is electric, especially at night when all the billboards light up the sky. This vibrant district truly never sleeps.",
+      "preview": "The bustling heart of Manhattan, Times Square is known for its bright lights, entertainment, and as the crossroads of the world.",
+      "audioLength": 150,
+      "location": "New York, NY"
+    },
+    {
+      "id": "brooklyn-bridge",
+      "poiName": "Brooklyn Bridge",
+      "latitude": 40.7061,
+      "longitude": -73.9969,
+      "radius": 60,
+      "script": "An iconic suspension bridge spanning the East River, connecting Manhattan and Brooklyn. The Brooklyn Bridge, completed in 1883, was the first steel-wire suspension bridge ever constructed. At the time of its completion, it was the longest suspension bridge in the world. The bridge's distinctive Gothic arches and cable-stayed design make it one of New York's most recognizable landmarks. Walking across the pedestrian path offers spectacular views of the Manhattan skyline and the Statue of Liberty in the distance. This engineering marvel continues to serve as a vital transportation link and a symbol of New York's ingenuity.",
+      "preview": "An iconic suspension bridge spanning the East River, connecting Manhattan and Brooklyn.",
+      "audioLength": 180,
+      "location": "New York, NY"
+    },
+    {
+      "id": "statue-of-liberty",
+      "poiName": "Statue of Liberty",
+      "latitude": 40.6892,
+      "longitude": -74.0445,
+      "radius": 80,
+      "script": "A symbol of freedom and democracy, standing proudly in New York Harbor. The Statue of Liberty, a gift from France to the United States, has welcomed immigrants and visitors to New York Harbor since 1886. Standing 305 feet tall, Lady Liberty represents freedom and democracy. The statue's torch symbolizes enlightenment, while the broken chains at her feet represent freedom from oppression. The seven spikes on her crown represent the seven continents and seas. This iconic symbol of American values continues to inspire millions of visitors each year and remains a powerful reminder of the nation's founding principles.",
+      "preview": "A symbol of freedom and democracy, standing proudly in New York Harbor.",
+      "audioLength": 200,
+      "location": "New York, NY"
+    }
+  ]
+} 
