@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import WorldTour from './components/WorldTour'
-import PastTours from './components/PastTours'
+import PastTours from './pages/PastTours'
 import Tours from './components/Tours'
 import About from './components/About'
 import Home from './pages/Home'
