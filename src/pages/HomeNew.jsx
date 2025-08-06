@@ -64,7 +64,7 @@ const HomeNew = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-500 via-blue-400 to-orange-400">
+    <div className="min-h-screen bg-gradient-to-br from-blue-100/20 via-blue-50/10 to-orange-100/10">
       <div className="flex flex-col h-screen">
         {/* Settings Button */}
         <motion.button
@@ -74,7 +74,7 @@ const HomeNew = () => {
           onClick={handleOpenSettings}
           className="absolute top-6 right-6 w-12 h-12 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110 active:scale-95 z-10"
         >
-          <Settings className="text-white text-xl" />
+          <Settings className="text-gray-600 text-xl" />
         </motion.button>
 
         {/* Main Content */}
@@ -109,7 +109,7 @@ const HomeNew = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.8, ease: "easeOut", delay: 0.3 }}
-              className="text-4xl font-bold text-white"
+              className="text-4xl font-bold text-gray-800"
             >
               World Tour
             </motion.h1>
@@ -123,12 +123,12 @@ const HomeNew = () => {
               transition={{ duration: 0.6, ease: "easeOut" }}
               className="w-full max-w-sm"
             >
-              <Card className="mb-8 bg-white/20 backdrop-blur-sm border-white/30">
+              <Card className="mb-8 bg-white/60 backdrop-blur-sm border-white/30">
                 <CardContent className="p-6">
                   <div className="text-center space-y-4">
                     <div className="flex items-center justify-center space-x-2">
-                      <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
-                      <span className="text-white font-medium">Monitoring {monitoringCount} locations</span>
+                      <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                      <span className="text-gray-600 font-medium">Monitoring {monitoringCount} locations</span>
                     </div>
                     
                     {activePOI && (
@@ -138,9 +138,9 @@ const HomeNew = () => {
                         transition={{ delay: 0.3, duration: 0.5 }}
                         className="space-y-2"
                       >
-                        <p className="text-white font-semibold">Nearby: {activePOI.title}</p>
-                        <p className="text-white/80 text-sm">{activePOI.description}</p>
-                        <p className="text-white/60 text-xs">Tap to start tour</p>
+                        <p className="text-blue-600 font-semibold">Nearby: {activePOI.title}</p>
+                        <p className="text-gray-500 text-sm">{activePOI.description}</p>
+                        <p className="text-gray-400 text-xs">Tap to start tour</p>
                       </motion.div>
                     )}
                   </div>
@@ -161,7 +161,7 @@ const HomeNew = () => {
                 onClick={handleStartTour}
                 variant="ios"
                 size="lg"
-                className="w-full flex items-center justify-center space-x-3 bg-white/20 backdrop-blur-sm border-white/30 text-white hover:bg-white/30"
+                className="w-full flex items-center justify-center space-x-3 bg-blue-500 hover:bg-blue-600 text-white"
               >
                 {locationEnabled ? (
                   <>
@@ -182,7 +182,7 @@ const HomeNew = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.6, ease: "easeOut", delay: 0.4 }}
-              className="text-center text-white/90 leading-relaxed text-base"
+              className="text-center text-gray-600 leading-relaxed text-base"
             >
               {locationEnabled 
                 ? 'Connect your headphones and start walking—World Tour will guide you.'
