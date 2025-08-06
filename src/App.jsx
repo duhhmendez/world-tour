@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import WorldTour from './components/WorldTour'
 import PastToursNew from './pages/PastToursNew'
 import Tours from './components/Tours'
 import About from './components/About'

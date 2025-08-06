@@ -1,51 +1,42 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { 
-  Play, 
-  Pause, 
-  SkipBack, 
-  SkipForward, 
+import {
+  Play,
+  Pause,
+  SkipBack,
+  SkipForward,
   X,
   Volume2,
   MapPin
 } from 'lucide-react'
 import { Button } from '../components/ui/button'
 
-const ActiveTourNew = ({ onEndTour }) => {
+const ActiveTourNew = ({ onEndTour, pois = [] }) => {
   const [isPlaying, setIsPlaying] = useState(false)
   const [currentTime, setCurrentTime] = useState(0)
-  const [totalTime, setTotalTime] = useState(180) // 3 minutes in seconds
+  const [totalTime, setTotalTime] = useState(180)
   const [currentPOIIndex, setCurrentPOIIndex] = useState(0)
   const [isScrubbing, setIsScrubbing] = useState(false)
   const [scrubTime, setScrubTime] = useState(0)
   const progressRef = useRef(null)
 
-  // Mock POI data for the current location
-  const currentLocationPOIs = [
-    {
-      id: "empire-state",
-      title: "Empire State Building",
-      description: "Standing 1,454 feet tall, the Empire State Building is an Art Deco masterpiece and one of New York's most iconic landmarks.",
-      audioLength: 180,
-      location: "New York, NY"
-    },
-    {
-      id: "central-park",
-      title: "Central Park",
-      description: "A vast urban oasis covering 843 acres, Central Park offers lakes, walking trails, and cultural landmarks in the heart of Manhattan.",
-      audioLength: 240,
-      location: "New York, NY"
-    },
-    {
-      id: "times-square",
-      title: "Times Square",
-      description: "The bustling heart of Manhattan, Times Square is known for its bright lights, entertainment, and as the crossroads of the world.",
-      audioLength: 150,
-      location: "New York, NY"
-    }
-  ]
+  // Use POIs from props or fallback to empty array
+  const currentLocationPOIs = pois.length > 0 ? pois.map(poi => ({
+    id: poi.id,
+    title: poi.name,
+    description: poi.script,
+    audioLength: 180, // Default audio length
+    location: poi.location || "Unknown Location"
+  })) : []
 
-  const currentPOI = currentLocationPOIs[currentPOIIndex]
+  const currentPOI = currentLocationPOIs[currentPOIIndex] || {
+    id: "default",
+    title: "No POI Available",
+    description: "No points of interest are currently available.",
+    audioLength: 180,
+    location: "Unknown Location"
+  }
+
   const isFirstPOI = currentPOIIndex === 0
   const isLastPOI = currentPOIIndex === currentLocationPOIs.length - 1
 
@@ -99,13 +90,13 @@ const ActiveTourNew = ({ onEndTour }) => {
 
   const handleProgressClick = (e) => {
     if (!progressRef.current) return
-    
+
     const rect = progressRef.current.getBoundingClientRect()
     const clickX = e.clientX - rect.left
     const progressWidth = rect.width
     const percentage = clickX / progressWidth
     const newTime = Math.floor(percentage * totalTime)
-    
+
     setCurrentTime(newTime)
     setScrubTime(newTime)
   }
@@ -129,6 +120,59 @@ const ActiveTourNew = ({ onEndTour }) => {
     onEndTour()
   }
 
+  // Show empty state if no POIs
+  if (currentLocationPOIs.length === 0) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-100/5 via-blue-50/5 to-orange-100/5">
+        <div className="flex flex-col h-screen">
+          {/* Header */}
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+            className="bg-white/80 backdrop-blur-sm border-b border-gray-200 px-6 py-4 sticky top-0 z-10"
+          >
+            <div className="flex items-center justify-between">
+              <div className="w-16"></div>
+              <h1 className="text-xl font-bold text-gray-800">Active Tour</h1>
+              <button
+                onClick={handleEndTour}
+                className="text-red-500 font-medium hover:text-red-600 transition-colors duration-200"
+              >
+                End Tour
+              </button>
+            </div>
+          </motion.div>
+
+          {/* Empty State */}
+          <div className="flex-1 flex items-center justify-center px-6">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.6, ease: "easeOut" }}
+              className="text-center space-y-6"
+            >
+              <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto">
+                <MapPin className="w-8 h-8 text-gray-400" />
+              </div>
+              <div className="space-y-2">
+                <h2 className="text-xl font-semibold text-gray-800">No Points of Interest</h2>
+                <p className="text-gray-600">No tour locations are currently available.</p>
+              </div>
+              <Button
+                onClick={handleEndTour}
+                variant="ios"
+                className="bg-blue-500 hover:bg-blue-600 text-white"
+              >
+                Return to Home
+              </Button>
+            </motion.div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-100/5 via-blue-50/5 to-orange-100/5">
       <div className="flex flex-col h-screen">
@@ -141,9 +185,9 @@ const ActiveTourNew = ({ onEndTour }) => {
         >
           <div className="flex items-center justify-between">
             <div className="w-16"></div> {/* Spacer for centering */}
-            
+
             <h1 className="text-xl font-bold text-gray-800">Active Tour</h1>
-            
+
             <button
               onClick={handleEndTour}
               className="text-red-500 font-medium hover:text-red-600 transition-colors duration-200"
@@ -221,7 +265,7 @@ const ActiveTourNew = ({ onEndTour }) => {
                   }}
                   transition={{ duration: 0.1 }}
                 />
-                
+
                 {/* Scrub Handle */}
                 <motion.div
                   className="absolute top-1/2 w-4 h-4 bg-blue-500 rounded-full shadow-lg transform -translate-y-1/2"
@@ -320,9 +364,6 @@ const ActiveTourNew = ({ onEndTour }) => {
               </motion.div>
             )}
           </div>
-
-          {/* Bottom Spacing */}
-          <div className="h-8"></div>
         </div>
       </div>
     </div>

@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Globe, MapPin, Volume2, Settings, Navigation } from 'lucide-react'
+import { Globe, MapPin, Volume2, Settings, Navigation, Loader2 } from 'lucide-react'
 import { Button } from '../components/ui/button'
 import { Card, CardContent } from '../components/ui/card'
 import ActiveTourNew from './ActiveTourNew'
 import SettingsNew from './SettingsNew'
+import { fetchPOIs } from '../lib/supabaseClient'
 
 const HomeNew = () => {
   const [locationEnabled, setLocationEnabled] = useState(false)
@@ -15,31 +16,30 @@ const HomeNew = () => {
   const [showActiveTour, setShowActiveTour] = useState(false)
   const [isDetecting, setIsDetecting] = useState(false)
   const [monitoringCount] = useState(3)
+  
+  // POI data state
+  const [pois, setPois] = useState([])
+  const [poisLoading, setPoisLoading] = useState(true)
+  const [poisError, setPoisError] = useState(null)
 
-  // Mock POI data with coordinates
-  const pois = [
-    {
-      id: "empire-state",
-      title: "Empire State Building",
-      description: "Standing 1,454 feet tall, the Empire State Building is an Art Deco masterpiece and one of New York's most iconic landmarks.",
-      coordinate: { latitude: 40.7484, longitude: -73.9857 },
-      radius: 50 // meters
-    },
-    {
-      id: "central-park",
-      title: "Central Park",
-      description: "A vast urban oasis covering 843 acres, Central Park offers lakes, walking trails, and cultural landmarks in the heart of Manhattan.",
-      coordinate: { latitude: 40.7829, longitude: -73.9654 },
-      radius: 100 // meters
-    },
-    {
-      id: "times-square",
-      title: "Times Square",
-      description: "The bustling heart of Manhattan, Times Square is known for its bright lights, entertainment, and as the crossroads of the world.",
-      coordinate: { latitude: 40.7580, longitude: -73.9855 },
-      radius: 75 // meters
+  // Fetch POIs from Supabase
+  useEffect(() => {
+    const loadPOIs = async () => {
+      try {
+        setPoisLoading(true)
+        setPoisError(null)
+        const poisData = await fetchPOIs()
+        setPois(poisData)
+      } catch (error) {
+        console.error('Failed to load POIs:', error)
+        setPoisError('Failed to load points of interest')
+      } finally {
+        setPoisLoading(false)
+      }
     }
-  ]
+
+    loadPOIs()
+  }, [])
 
   // Haversine formula to calculate distance between two points
   const getDistanceInMeters = (lat1, lon1, lat2, lon2) => {
@@ -64,20 +64,39 @@ const HomeNew = () => {
 
   // Get the closest POI to user's location
   const getClosestPOI = (userLat, userLon) => {
-    if (!userLat || !userLon) return null
+    if (!userLat || !userLon || pois.length === 0) return null
 
     let closest = null
     let minDistance = Infinity
 
     pois.forEach(poi => {
+      // Parse coordinates from the location field or use default coordinates
+      // Assuming location field contains "latitude,longitude" format
+      let poiLat, poiLon
+      
+      if (poi.location && poi.location.includes(',')) {
+        const [lat, lon] = poi.location.split(',').map(coord => parseFloat(coord.trim()))
+        poiLat = lat
+        poiLon = lon
+      } else {
+        // Fallback coordinates for development
+        poiLat = 40.7484
+        poiLon = -73.9857
+      }
+
       const distance = getDistanceInMeters(
         userLat, userLon,
-        poi.coordinate.latitude, poi.coordinate.longitude
+        poiLat, poiLon
       )
       
       if (distance < minDistance) {
         minDistance = distance
-        closest = { ...poi, distance }
+        closest = { 
+          ...poi, 
+          distance,
+          coordinate: { latitude: poiLat, longitude: poiLon },
+          radius: 50 // Default radius in meters
+        }
       }
     })
 
@@ -86,7 +105,7 @@ const HomeNew = () => {
 
   // Check if user is within range of a POI
   const isWithinRange = (poi, distance) => {
-    return distance <= poi.radius
+    return distance <= (poi.radius || 50)
   }
 
   // Update POI status based on user location
@@ -131,11 +150,11 @@ const HomeNew = () => {
       clearTimeout(locationTimer)
       clearTimeout(poiTimer)
     }
-  }, [])
+  }, [pois]) // Add pois as dependency
 
   // Real-time location updates (simulated)
   useEffect(() => {
-    if (!locationEnabled || !userLocation) return
+    if (!locationEnabled || !userLocation || pois.length === 0) return
 
     const locationUpdateInterval = setInterval(() => {
       // Simulate user movement
@@ -148,7 +167,7 @@ const HomeNew = () => {
     }, 5000) // Update every 5 seconds
 
     return () => clearInterval(locationUpdateInterval)
-  }, [locationEnabled, userLocation])
+  }, [locationEnabled, userLocation, pois])
 
   const handleStartTour = () => {
     if (!locationEnabled) {
@@ -184,11 +203,15 @@ const HomeNew = () => {
 
   // Show Active Tour screen if active
   if (showActiveTour) {
-    return <ActiveTourNew onEndTour={handleEndTour} />
+    return <ActiveTourNew onEndTour={handleEndTour} pois={pois} />
   }
 
   const getSubtitleText = () => {
-    if (!locationEnabled) {
+    if (poisLoading) {
+      return "Loading points of interest..."
+    } else if (poisError) {
+      return "Unable to load points of interest"
+    } else if (!locationEnabled) {
       return "Enable location to discover nearby landmarks"
     } else if (isDetecting) {
       return "Scanning for nearby landmarks..."
@@ -203,6 +226,50 @@ const HomeNew = () => {
 
   const LocationStatusPanel = () => {
     if (!locationEnabled) return null
+
+    if (poisLoading) {
+      return (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
+          className="w-full max-w-sm"
+        >
+          <Card className="bg-white/80 backdrop-blur-sm border-white/30 shadow-lg">
+            <CardContent className="p-6">
+              <div className="text-center space-y-4">
+                <div className="flex items-center justify-center space-x-2">
+                  <Loader2 className="w-5 h-5 animate-spin text-blue-500" />
+                  <span className="text-gray-600 font-medium">Loading POIs...</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      )
+    }
+
+    if (poisError) {
+      return (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
+          className="w-full max-w-sm"
+        >
+          <Card className="bg-white/80 backdrop-blur-sm border-white/30 shadow-lg">
+            <CardContent className="p-6">
+              <div className="text-center space-y-4">
+                <div className="flex items-center justify-center space-x-2">
+                  <span className="text-red-500 font-medium">Error loading POIs</span>
+                </div>
+                <p className="text-gray-500 text-sm">{poisError}</p>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      )
+    }
 
     if (isDetecting) {
       return (
@@ -251,7 +318,7 @@ const HomeNew = () => {
                 {/* Detection Status */}
                 <div className="flex items-center justify-center space-x-2 mb-4">
                   <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-                  <span className="text-gray-600 font-medium">Monitoring {monitoringCount} locations</span>
+                  <span className="text-gray-600 font-medium">Monitoring {pois.length} locations</span>
                 </div>
                 
                 {/* POI Information */}
@@ -263,11 +330,11 @@ const HomeNew = () => {
                 >
                   <div className="flex items-center justify-center space-x-2">
                     <Navigation className="text-blue-500 w-5 h-5" />
-                    <span className="text-blue-600 font-semibold text-lg">Nearby: {activePOI.title}</span>
+                    <span className="text-blue-600 font-semibold text-lg">Nearby: {activePOI.name}</span>
                   </div>
                   
                   <p className="text-gray-600 text-sm leading-relaxed">
-                    {activePOI.description}
+                    {activePOI.script}
                   </p>
                   
                   <div className="flex items-center justify-center space-x-2 pt-2">
@@ -298,7 +365,7 @@ const HomeNew = () => {
                 {/* Detection Status */}
                 <div className="flex items-center justify-center space-x-2 mb-4">
                   <div className="w-3 h-3 bg-blue-500 rounded-full animate-pulse"></div>
-                  <span className="text-gray-600 font-medium">Monitoring {monitoringCount} locations</span>
+                  <span className="text-gray-600 font-medium">Monitoring {pois.length} locations</span>
                 </div>
                 
                 {/* Closest POI Information */}
@@ -310,7 +377,7 @@ const HomeNew = () => {
                 >
                   <div className="flex items-center justify-center space-x-2">
                     <MapPin className="text-orange-500 w-5 h-5" />
-                    <span className="text-orange-600 font-semibold text-lg">Closest POI: {closestPOI.title}</span>
+                    <span className="text-orange-600 font-semibold text-lg">Closest POI: {closestPOI.name}</span>
                   </div>
                   
                   <p className="text-gray-600 text-sm font-medium">
@@ -420,7 +487,7 @@ const HomeNew = () => {
           {/* Bottom Section */}
           <div className="w-full max-w-sm space-y-8">
             {/* Start Tour Button - Only show when location enabled but no POI */}
-            {locationEnabled && !isDetecting && !activePOI && (
+            {locationEnabled && !isDetecting && !activePOI && !poisLoading && !poisError && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
