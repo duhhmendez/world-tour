@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { BiWorld, BiMapPin, BiVolumeFull, BiCog } from 'react-icons/bi'
+import ActiveTour from './ActiveTour'
 
 // Location Status Panel Component
 const LocationStatusPanel = ({ locationEnabled, activePOI, monitoringCount }) => {
@@ -170,6 +171,7 @@ const Home = () => {
   const [locationEnabled, setLocationEnabled] = useState(false)
   const [activePOI, setActivePOI] = useState(null)
   const [showSettings, setShowSettings] = useState(false)
+  const [showActiveTour, setShowActiveTour] = useState(false)
   const [monitoringCount] = useState(3) // Mock data
 
   // Simulate location permission and POI detection
@@ -203,8 +205,8 @@ const Home = () => {
         )
       }
     } else {
-      // Start tour logic
-      console.log('Starting tour...')
+      // Start tour - show active tour screen
+      setShowActiveTour(true)
     }
   }
 
@@ -214,6 +216,15 @@ const Home = () => {
 
   const handleCloseSettings = () => {
     setShowSettings(false)
+  }
+
+  const handleEndTour = () => {
+    setShowActiveTour(false)
+  }
+
+  // Show Active Tour screen if active
+  if (showActiveTour) {
+    return <ActiveTour onEndTour={handleEndTour} />
   }
 
   return (
