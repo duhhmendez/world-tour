@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { BiHeadphones, BiMapPin, BiTime, BiCalendar, BiBookOpen } from 'react-icons/bi'
+import { BiVolumeFull, BiMapPin, BiTime, BiCalendar, BiBookOpen } from 'react-icons/bi'
 
 const PastTours = () => {
   const [pastTours] = useState([
@@ -133,7 +133,7 @@ const PastTours = () => {
         }}
         className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mb-6"
       >
-        <BiHeadphones className="text-4xl text-blue-500" />
+        <BiVolumeFull className="text-4xl text-blue-500" />
       </motion.div>
 
       {/* Title */}
@@ -182,7 +182,7 @@ const PastTours = () => {
             <h1 className="text-3xl font-bold text-gray-800">Past Tours</h1>
             <div className="flex items-center space-x-2">
               <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                <BiHeadphones className="text-blue-500 text-lg" />
+                <BiVolumeFull className="text-blue-500 text-lg" />
               </div>
             </div>
           </div>
