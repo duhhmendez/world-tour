@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { BiWorld, BiMapPin, BiHeadphones, BiCog } from 'react-icons/bi'
+import { BiWorld, BiMapPin, BiVolumeFull, BiCog } from 'react-icons/bi'
 
 // Location Status Panel Component
 const LocationStatusPanel = ({ locationEnabled, activePOI, monitoringCount }) => {
@@ -38,7 +38,7 @@ const LocationStatusPanel = ({ locationEnabled, activePOI, monitoringCount }) =>
 // Start Tour Button Component
 const StartTourButton = ({ locationEnabled, onStartTour }) => {
   const buttonText = locationEnabled ? 'Start Tour' : 'Enable Location'
-  const buttonIcon = locationEnabled ? BiHeadphones : BiMapPin
+  const buttonIcon = locationEnabled ? BiVolumeFull : BiMapPin
 
   return (
     <motion.button
