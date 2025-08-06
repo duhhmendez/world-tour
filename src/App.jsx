@@ -19,7 +19,6 @@ function App() {
               <div className="flex-1 overflow-hidden">
                 {currentTab === 'home' && <HomeNew />}
                 {currentTab === 'past-tours' && <PastToursNew />}
-                {currentTab === 'tours' && <Tours />}
               </div>
 
               {/* Tab Navigation - iOS Style */}
@@ -35,18 +34,6 @@ function App() {
                   >
                     <span className="text-xl mb-1">🏠</span>
                     <span className="text-xs font-medium">Home</span>
-                  </button>
-                  
-                  <button
-                    onClick={() => setCurrentTab('tours')}
-                    className={`flex flex-col items-center py-2 px-4 rounded-lg transition-colors ${
-                      currentTab === 'tours' 
-                        ? 'text-blue-500 bg-blue-50' 
-                        : 'text-gray-500 hover:text-gray-700'
-                    }`}
-                  >
-                    <span className="text-xl mb-1">🌍</span>
-                    <span className="text-xs font-medium">Tours</span>
                   </button>
                   
                   <button
