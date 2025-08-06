@@ -140,18 +140,16 @@ const ActiveTourNew = ({ onEndTour }) => {
           className="bg-white/80 backdrop-blur-sm border-b border-gray-200 px-6 py-4 sticky top-0 z-10"
         >
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <button
-                onClick={handleEndTour}
-                className="text-red-500 font-medium hover:text-red-600 transition-colors duration-200"
-              >
-                End Tour
-              </button>
-            </div>
+            <div className="w-16"></div> {/* Spacer for centering */}
             
             <h1 className="text-xl font-bold text-gray-800">Active Tour</h1>
             
-            <div className="w-16"></div> {/* Spacer for centering */}
+            <button
+              onClick={handleEndTour}
+              className="text-red-500 font-medium hover:text-red-600 transition-colors duration-200"
+            >
+              End Tour
+            </button>
           </div>
         </motion.div>
 
