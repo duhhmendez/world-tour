@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import WorldTour from './components/WorldTour'
-import PastTours from './pages/PastTours'
+import PastToursNew from './pages/PastToursNew'
 import Tours from './components/Tours'
 import About from './components/About'
 import HomeNew from './pages/HomeNew'
@@ -18,7 +18,7 @@ function App() {
               {/* Main Content - iOS Style */}
               <div className="flex-1 overflow-hidden">
                 {currentTab === 'home' && <HomeNew />}
-                {currentTab === 'past-tours' && <PastTours />}
+                {currentTab === 'past-tours' && <PastToursNew />}
                 {currentTab === 'tours' && <Tours />}
               </div>
 

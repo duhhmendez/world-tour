@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Globe, MapPin, Volume2, Settings, Play, Pause, SkipBack, SkipForward } from 'lucide-react'
+import { Globe, MapPin, Volume2, Settings } from 'lucide-react'
 import { Button } from '../components/ui/button'
 import { Card, CardContent } from '../components/ui/card'
+import ActiveTourNew from './ActiveTourNew'
+import SettingsNew from './SettingsNew'
 
 const HomeNew = () => {
   const [locationEnabled, setLocationEnabled] = useState(false)
@@ -198,121 +200,6 @@ const HomeNew = () => {
         )}
       </AnimatePresence>
     </div>
-  )
-}
-
-// Placeholder components for now
-const ActiveTourNew = ({ onEndTour }) => {
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-blue-100 to-orange-50">
-      <div className="flex flex-col h-screen">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: "easeOut" }}
-          className="bg-white/80 backdrop-blur-sm border-b border-white/20 px-6 py-8"
-        >
-          <div className="flex items-center justify-between">
-            <Button
-              onClick={onEndTour}
-              variant="ghost"
-              className="flex items-center space-x-2 text-blue-600 font-semibold"
-            >
-              <span>←</span>
-              <span>End Tour</span>
-            </Button>
-            
-            <h1 className="text-xl font-bold text-gray-800">Active Tour</h1>
-            
-            <div className="w-20"></div>
-          </div>
-        </motion.div>
-
-        {/* Content */}
-        <div className="flex-1 flex flex-col justify-between items-center px-6 py-12">
-          <div className="text-center space-y-6">
-            <motion.h2
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, ease: "easeOut" }}
-              className="text-4xl font-bold text-gray-800"
-            >
-              Empire State Building
-            </motion.h2>
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.6, ease: "easeOut", delay: 0.3 }}
-              className="text-xl text-gray-600"
-            >
-              New York, NY
-            </motion.p>
-          </div>
-
-          <div className="w-full max-w-md space-y-6">
-            <div className="space-y-3">
-              <div className="flex justify-between text-sm text-gray-600">
-                <span>0:12</span>
-                <span>3:41</span>
-              </div>
-              <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
-                <motion.div
-                  initial={{ width: 0 }}
-                  animate={{ width: "25%" }}
-                  transition={{ duration: 0.3, ease: "easeOut" }}
-                  className="h-full bg-gradient-to-r from-blue-500 to-blue-600 rounded-full"
-                />
-              </div>
-            </div>
-
-            <div className="flex items-center justify-center space-x-8">
-              <Button variant="iosSecondary" size="icon">
-                <SkipBack className="text-xl" />
-              </Button>
-              <Button variant="ios" size="icon" className="w-16 h-16">
-                <Play className="text-2xl" />
-              </Button>
-              <Button variant="iosSecondary" size="icon">
-                <SkipForward className="text-xl" />
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-const SettingsNew = ({ onClose }) => {
-  return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-      onClick={onClose}
-    >
-      <motion.div
-        initial={{ scale: 0.9, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        exit={{ scale: 0.9, opacity: 0 }}
-        transition={{ duration: 0.3, ease: "easeOut" }}
-        className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-hidden"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="flex justify-between items-center p-6 border-b border-gray-100">
-          <Button onClick={onClose} variant="ghost" className="text-blue-600 font-semibold">
-            Done
-          </Button>
-          <h2 className="text-xl font-bold text-gray-800">Settings</h2>
-          <div className="w-12"></div>
-        </div>
-        <div className="p-6">
-          <p className="text-center text-gray-500">Settings coming soon...</p>
-        </div>
-      </motion.div>
-    </motion.div>
   )
 }
 
