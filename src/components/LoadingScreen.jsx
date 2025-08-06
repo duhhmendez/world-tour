@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Globe } from 'react-icons/ai'
+import { BiWorld } from 'react-icons/bi'
 
 const LoadingScreen = ({ onComplete }) => {
   const [showTitle, setShowTitle] = useState(false)
@@ -56,7 +56,7 @@ const LoadingScreen = ({ onComplete }) => {
           }}
           className="flex justify-center"
         >
-          <Globe className="text-[100px] text-blue-500" />
+          <BiWorld className="text-[100px] text-blue-500" />
         </motion.div>
 
         {/* App Title with Fade-in Animation */}
