@@ -29,10 +29,61 @@ const HomeNew = () => {
         setPoisLoading(true)
         setPoisError(null)
         const poisData = await fetchPOIs()
-        setPois(poisData)
+        
+        // If no POIs from Supabase, add some mock POIs for testing
+        if (poisData.length === 0) {
+          console.log('No POIs from Supabase, using mock data for testing')
+          const mockPois = [
+            {
+              id: "empire-state",
+              name: "Empire State Building",
+              script: "Standing 1,454 feet tall, the Empire State Building is an Art Deco masterpiece and one of New York's most iconic landmarks.",
+              location: "40.7484,-73.9857"
+            },
+            {
+              id: "central-park",
+              name: "Central Park",
+              script: "A vast urban oasis covering 843 acres, Central Park offers lakes, walking trails, and cultural landmarks in the heart of Manhattan.",
+              location: "40.7829,-73.9654"
+            },
+            {
+              id: "times-square",
+              name: "Times Square",
+              script: "The bustling heart of Manhattan, Times Square is known for its bright lights, entertainment, and as the crossroads of the world.",
+              location: "40.7580,-73.9855"
+            }
+          ]
+          setPois(mockPois)
+        } else {
+          setPois(poisData)
+        }
       } catch (error) {
         console.error('Failed to load POIs:', error)
         setPoisError('Failed to load points of interest')
+        
+        // Add mock POIs on error for testing
+        console.log('Using mock POIs due to error')
+        const mockPois = [
+          {
+            id: "empire-state",
+            name: "Empire State Building",
+            script: "Standing 1,454 feet tall, the Empire State Building is an Art Deco masterpiece and one of New York's most iconic landmarks.",
+            location: "40.7484,-73.9857"
+          },
+          {
+            id: "central-park",
+            name: "Central Park",
+            script: "A vast urban oasis covering 843 acres, Central Park offers lakes, walking trails, and cultural landmarks in the heart of Manhattan.",
+            location: "40.7829,-73.9654"
+          },
+          {
+            id: "times-square",
+            name: "Times Square",
+            script: "The bustling heart of Manhattan, Times Square is known for its bright lights, entertainment, and as the crossroads of the world.",
+            location: "40.7580,-73.9855"
+          }
+        ]
+        setPois(mockPois)
       } finally {
         setPoisLoading(false)
       }
