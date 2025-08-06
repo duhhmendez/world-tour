@@ -29,6 +29,7 @@ const HomeNew = () => {
         setPoisLoading(true)
         setPoisError(null)
         const poisData = await fetchPOIs()
+        console.log('POIs loaded from Supabase:', poisData)
         setPois(poisData)
       } catch (error) {
         console.error('Failed to load POIs:', error)
@@ -98,8 +99,10 @@ const HomeNew = () => {
         const [lat, lon] = poi.location.split(',').map(coord => parseFloat(coord.trim()))
         poiLat = lat
         poiLon = lon
+        console.log(`POI "${poi.name}" coordinates:`, { lat: poiLat, lon: poiLon, location: poi.location })
       } else {
         // Skip POIs without valid coordinates
+        console.log(`POI "${poi.name}" has invalid location format:`, poi.location)
         return
       }
 
