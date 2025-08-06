@@ -85,7 +85,7 @@ const PastToursNew = () => {
       transition={{ duration: 0.6, ease: "easeOut" }}
       className="w-full"
     >
-      <Card className="cursor-pointer hover:shadow-lg transition-all duration-300 transform hover:scale-[1.02]">
+      <Card className="cursor-pointer hover:shadow-lg transition-all duration-300 transform hover:scale-[1.02] bg-white/90 backdrop-blur-sm">
         <CardContent className="p-6">
           {/* Header */}
           <div className="flex items-start justify-between mb-4">
@@ -158,9 +158,9 @@ const PastToursNew = () => {
           repeat: Infinity,
           ease: "easeInOut"
         }}
-        className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mb-6"
+        className="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center mb-6 border border-white/30"
       >
-        <Headphones className="text-4xl text-blue-500" />
+        <Headphones className="text-4xl text-white" />
       </motion.div>
 
       {/* Title */}
@@ -168,7 +168,7 @@ const PastToursNew = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: "easeOut", delay: 0.2 }}
-        className="text-2xl font-bold text-gray-800 mb-3"
+        className="text-2xl font-bold text-white mb-3"
       >
         No Past Tours
       </motion.h2>
@@ -178,7 +178,7 @@ const PastToursNew = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: "easeOut", delay: 0.4 }}
-        className="text-gray-600 text-lg leading-relaxed max-w-sm"
+        className="text-white/90 text-lg leading-relaxed max-w-sm"
       >
         Your completed tours will appear here
       </motion.p>
@@ -188,7 +188,7 @@ const PastToursNew = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: "easeOut", delay: 0.6 }}
-        className="text-gray-400 text-sm mt-4"
+        className="text-white/70 text-sm mt-4"
       >
         Start exploring to create your first tour
       </motion.p>
@@ -196,20 +196,20 @@ const PastToursNew = () => {
   )
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-blue-100 to-orange-50">
+    <div className="min-h-screen bg-gradient-to-br from-blue-500 via-blue-400 to-orange-400">
       <div className="flex flex-col h-screen">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
-          className="bg-white/80 backdrop-blur-sm border-b border-white/20 px-6 py-8 sticky top-0 z-10"
+          className="bg-white/20 backdrop-blur-sm border-b border-white/20 px-6 py-8 sticky top-0 z-10"
         >
           <div className="flex items-center justify-between">
-            <h1 className="text-3xl font-bold text-gray-800">Past Tours</h1>
+            <h1 className="text-3xl font-bold text-white">Past Tours</h1>
             <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                <Volume2 className="text-blue-500 text-lg" />
+              <div className="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-white/30">
+                <Volume2 className="text-white text-lg" />
               </div>
             </div>
           </div>
@@ -228,11 +228,11 @@ const PastToursNew = () => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, ease: "easeOut" }}
                 >
-                  <Card>
+                  <Card className="bg-white/20 backdrop-blur-sm border-white/30">
                     <CardContent className="p-4">
                       <div className="flex items-center justify-between text-sm">
-                        <span className="text-gray-600">Total Tours</span>
-                        <span className="font-bold text-gray-800">{pastTours.length}</span>
+                        <span className="text-white/90">Total Tours</span>
+                        <span className="font-bold text-white">{pastTours.length}</span>
                       </div>
                     </CardContent>
                   </Card>
