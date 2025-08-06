@@ -21,7 +21,7 @@ function App() {
                 {currentTab === 'tours' && <Tours />}
               </div>
 
-              {/* Tab Navigation - Updated for deployment */}
+              {/* Tab Navigation - iOS Style Updated */}
               <div className="bg-white border-t border-gray-200 px-4 py-2">
                 <div className="flex justify-around">
                   <button

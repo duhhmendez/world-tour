@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import toursData from '../data/tours.json'
 
-// Loading Screen Component - iOS Style
+// Loading Screen Component - iOS Style v2.0
 const LoadingView = () => {
   const [isAnimating, setIsAnimating] = useState(false)
 
@@ -32,7 +32,7 @@ const LoadingView = () => {
   )
 }
 
-// Home View Component - iOS Style
+// Home View Component - iOS Style v2.0
 const HomeView = ({ locationManager, onStartTour, onOpenSettings }) => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-blue-100 to-orange-50">
