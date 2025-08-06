@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import toursData from '../data/tours.json'
 
-// Loading Screen Component
+// Loading Screen Component - iOS Style
 const LoadingView = () => {
   const [isAnimating, setIsAnimating] = useState(false)
 
@@ -11,70 +11,79 @@ const LoadingView = () => {
   }, [])
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-orange-50 flex items-center justify-center">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-blue-100 to-orange-50 flex items-center justify-center">
       <div className="text-center space-y-8">
-        <div className={`text-6xl text-blue-500 transition-all duration-1000 ${isAnimating ? 'scale-110' : 'scale-100'}`}>
+        {/* Animated Globe Icon */}
+        <div className={`text-8xl text-blue-500 transition-all duration-2000 ${isAnimating ? 'scale-110' : 'scale-100'}`}>
           🌍
         </div>
-        <h1 className="text-4xl font-bold text-gray-800 opacity-0 animate-fade-in">
+        
+        {/* App Name with Fade-in Animation */}
+        <h1 className={`text-5xl font-bold text-gray-800 transition-all duration-1000 ${isAnimating ? 'opacity-100' : 'opacity-0'}`}>
           World Tour
         </h1>
-        <div className="flex justify-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+        
+        {/* Loading Spinner */}
+        <div className={`flex justify-center transition-all duration-1000 ${isAnimating ? 'opacity-100' : 'opacity-0'}`}>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
         </div>
       </div>
     </div>
   )
 }
 
-// Home View Component
+// Home View Component - iOS Style
 const HomeView = ({ locationManager, onStartTour, onOpenSettings }) => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-orange-50">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-blue-100 to-orange-50">
       <div className="flex flex-col items-center justify-center min-h-screen px-8 relative">
-        {/* Settings Button */}
+        {/* Settings Button - iOS Style */}
         <button
           onClick={onOpenSettings}
-          className="absolute top-6 right-6 w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center"
+          className="absolute top-6 right-6 w-11 h-11 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg"
         >
-          <span className="text-gray-600">⚙️</span>
+          <span className="text-gray-600 text-xl">⚙️</span>
         </button>
 
-        <div className="text-center space-y-8 mb-12">
-          <div className="text-6xl">🌍</div>
-          <h1 className="text-4xl font-bold text-gray-800">World Tour</h1>
+        <div className="text-center space-y-12 mb-12">
+          {/* Large Globe Icon */}
+          <div className="text-8xl text-blue-500 mb-6">🌍</div>
+          
+          {/* App Title */}
+          <h1 className="text-5xl font-bold text-gray-800">World Tour</h1>
         </div>
 
-        {/* Location Status */}
+        {/* Location Status - iOS Style */}
         {locationManager.isMonitoring && (
-          <div className="bg-white rounded-xl p-4 mb-8 shadow-lg">
-            <div className="flex items-center justify-center space-x-2 mb-2">
-              <span className="text-green-500">📍</span>
-              <span className="text-sm text-gray-600">Monitoring {toursData.pois.length} locations</span>
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 mb-8 shadow-lg border border-white/20">
+            <div className="flex items-center justify-center space-x-3 mb-3">
+              <span className="text-green-500 text-xl">📍</span>
+              <span className="text-gray-600 font-medium">Monitoring {toursData.pois.length} locations</span>
             </div>
             {locationManager.activePOI && (
               <div className="text-center">
-                <p className="text-sm text-blue-600">Nearby: {locationManager.activePOI.poiName}</p>
-                <p className="text-xs text-gray-500">Tap to start tour</p>
+                <p className="text-blue-600 font-medium">Nearby: {locationManager.activePOI.poiName}</p>
+                <p className="text-gray-500 text-sm">Tap to start tour</p>
               </div>
             )}
           </div>
         )}
 
-        {/* Start Tour Button */}
+        {/* Start Tour Button - iOS Style */}
         <button
           onClick={onStartTour}
-          className="w-full max-w-sm bg-gradient-to-r from-blue-500 to-blue-600 text-white py-4 px-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center space-x-3"
+          className="w-full max-w-sm bg-gradient-to-r from-blue-500 to-blue-600 text-white py-6 px-8 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 flex items-center justify-center space-x-4 mb-8"
         >
-          <span className="text-xl">
+          <span className="text-2xl">
             {locationManager.isLocationEnabled ? '🎧' : '📍'}
           </span>
-          <span className="text-lg font-semibold">
+          <span className="text-xl font-semibold">
             {locationManager.isLocationEnabled ? 'Start Tour' : 'Enable Location'}
           </span>
         </button>
 
-        <p className="text-center text-gray-600 mt-4 max-w-sm">
+        {/* Subtitle - iOS Style */}
+        <p className="text-center text-gray-600 text-lg max-w-sm leading-relaxed">
           {locationManager.isLocationEnabled 
             ? 'Connect your headphones and start walking—World Tour will guide you.'
             : 'Enable location to discover nearby landmarks'
@@ -85,7 +94,7 @@ const HomeView = ({ locationManager, onStartTour, onOpenSettings }) => {
   )
 }
 
-// Active Tour View Component
+// Active Tour View Component - iOS Style
 const ActiveTourView = ({ currentPOI, onEndTour, onPlayTour, onStopTour, isPlaying, currentTime, audioLength }) => {
   const [isAnimating, setIsAnimating] = useState(false)
 
@@ -102,37 +111,37 @@ const ActiveTourView = ({ currentPOI, onEndTour, onPlayTour, onStopTour, isPlayi
   const progress = (currentTime / audioLength) * 100
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-orange-50">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-blue-100 to-orange-50">
       <div className="flex flex-col h-screen">
-        {/* Header */}
+        {/* Header - iOS Style */}
         <div className="flex justify-between items-center p-6">
           <button
             onClick={onEndTour}
-            className="text-red-500 font-medium"
+            className="text-red-500 font-semibold text-lg"
           >
             End Tour
           </button>
-          <h2 className="text-lg font-semibold">Active Tour</h2>
+          <h2 className="text-xl font-semibold text-gray-800">Active Tour</h2>
           <div className="w-16"></div>
         </div>
 
-        {/* Main Content */}
+        {/* Main Content - iOS Style */}
         <div className="flex-1 flex flex-col items-center justify-center px-8">
-          {/* POI Info */}
-          <div className="text-center space-y-4 mb-12">
-            <h1 className={`text-3xl font-bold text-gray-800 transition-all duration-800 ${isAnimating ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}>
+          {/* POI Info - iOS Style */}
+          <div className="text-center space-y-6 mb-16">
+            <h1 className={`text-4xl font-bold text-gray-800 transition-all duration-800 ${isAnimating ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}>
               {currentPOI?.poiName || 'Nearby Tour'}
             </h1>
-            <p className="text-gray-600">New York, NY</p>
+            <p className="text-gray-600 text-xl">New York, NY</p>
           </div>
 
-          {/* Audio Controls */}
+          {/* Audio Controls - iOS Style */}
           <div className="w-full max-w-md space-y-8">
-            {/* Progress Bar */}
-            <div className="space-y-3">
-              <div className="w-full bg-gray-200 rounded-full h-2">
+            {/* Progress Bar - iOS Style */}
+            <div className="space-y-4">
+              <div className="w-full bg-gray-200 rounded-full h-3">
                 <div 
-                  className="bg-blue-500 h-2 rounded-full transition-all duration-300"
+                  className="bg-blue-500 h-3 rounded-full transition-all duration-300"
                   style={{ width: `${progress}%` }}
                 ></div>
               </div>
@@ -142,23 +151,23 @@ const ActiveTourView = ({ currentPOI, onEndTour, onPlayTour, onStopTour, isPlayi
               </div>
             </div>
 
-            {/* Playback Controls */}
+            {/* Playback Controls - iOS Style */}
             <div className="flex items-center justify-center space-x-12">
-              <button className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
-                <span className="text-xl">⏮️</span>
+              <button className="w-14 h-14 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg">
+                <span className="text-2xl">⏮️</span>
               </button>
               
               <button
                 onClick={isPlaying ? onStopTour : onPlayTour}
-                className="w-16 h-16 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center shadow-lg"
+                className="w-20 h-20 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center shadow-xl"
               >
-                <span className="text-2xl text-white">
+                <span className="text-3xl text-white">
                   {isPlaying ? '⏸️' : '▶️'}
                 </span>
               </button>
               
-              <button className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
-                <span className="text-xl">⏭️</span>
+              <button className="w-14 h-14 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg">
+                <span className="text-2xl">⏭️</span>
               </button>
             </div>
           </div>
@@ -168,7 +177,7 @@ const ActiveTourView = ({ currentPOI, onEndTour, onPlayTour, onStopTour, isPlayi
   )
 }
 
-// Settings View Component
+// Settings View Component - iOS Style
 const SettingsView = ({ onClose }) => {
   const [voiceGender, setVoiceGender] = useState('neutral')
   const [voiceTone, setVoiceTone] = useState('friendly')
@@ -176,31 +185,31 @@ const SettingsView = ({ onClose }) => {
   const [offlineMode, setOfflineMode] = useState(false)
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-orange-50">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-blue-100 to-orange-50">
       <div className="flex justify-between items-center p-6">
-        <button onClick={onClose} className="text-blue-500 font-medium">
+        <button onClick={onClose} className="text-blue-500 font-semibold text-lg">
           Done
         </button>
-        <h1 className="text-xl font-semibold">Settings</h1>
+        <h1 className="text-2xl font-bold text-gray-800">Settings</h1>
         <div className="w-12"></div>
       </div>
 
       <div className="px-6">
-        <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-          {/* Voice Settings */}
+        <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl overflow-hidden">
+          {/* Voice Settings - iOS Style */}
           <div className="p-6 border-b border-gray-100">
-            <h3 className="text-lg font-semibold mb-4">Voice Settings</h3>
+            <h3 className="text-xl font-semibold mb-6 text-gray-800">Voice Settings</h3>
             
-            <div className="space-y-4">
+            <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium">Voice Gender</p>
+                  <p className="font-semibold text-gray-800">Voice Gender</p>
                   <p className="text-sm text-gray-500">Choose the voice for audio guides</p>
                 </div>
                 <select 
                   value={voiceGender} 
                   onChange={(e) => setVoiceGender(e.target.value)}
-                  className="border border-gray-200 rounded-lg px-3 py-2"
+                  className="border border-gray-200 rounded-xl px-4 py-2 bg-white"
                 >
                   <option value="male">Male</option>
                   <option value="female">Female</option>
@@ -210,13 +219,13 @@ const SettingsView = ({ onClose }) => {
 
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium">Voice Tone</p>
+                  <p className="font-semibold text-gray-800">Voice Tone</p>
                   <p className="text-sm text-gray-500">Select the tone of voice narration</p>
                 </div>
                 <select 
                   value={voiceTone} 
                   onChange={(e) => setVoiceTone(e.target.value)}
-                  className="border border-gray-200 rounded-lg px-3 py-2"
+                  className="border border-gray-200 rounded-xl px-4 py-2 bg-white"
                 >
                   <option value="friendly">Friendly</option>
                   <option value="dramatic">Dramatic</option>
@@ -226,49 +235,49 @@ const SettingsView = ({ onClose }) => {
             </div>
           </div>
 
-          {/* Audio Settings */}
+          {/* Audio Settings - iOS Style */}
           <div className="p-6 border-b border-gray-100">
-            <h3 className="text-lg font-semibold mb-4">Audio Settings</h3>
+            <h3 className="text-xl font-semibold mb-6 text-gray-800">Audio Settings</h3>
             
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium">Background Ambience</p>
+                <p className="font-semibold text-gray-800">Background Ambience</p>
                 <p className="text-sm text-gray-500">Play ambient sounds during tours</p>
               </div>
               <input
                 type="checkbox"
                 checked={backgroundAmbience}
                 onChange={(e) => setBackgroundAmbience(e.target.checked)}
-                className="w-6 h-6 text-blue-500"
+                className="w-6 h-6 text-blue-500 rounded"
               />
             </div>
           </div>
 
-          {/* App Settings */}
+          {/* App Settings - iOS Style */}
           <div className="p-6 border-b border-gray-100">
-            <h3 className="text-lg font-semibold mb-4">App Settings</h3>
+            <h3 className="text-xl font-semibold mb-6 text-gray-800">App Settings</h3>
             
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium">Offline Mode</p>
+                <p className="font-semibold text-gray-800">Offline Mode</p>
                 <p className="text-sm text-gray-500">Use downloaded content only</p>
               </div>
               <input
                 type="checkbox"
                 checked={offlineMode}
                 onChange={(e) => setOfflineMode(e.target.checked)}
-                className="w-6 h-6 text-blue-500"
+                className="w-6 h-6 text-blue-500 rounded"
               />
             </div>
           </div>
 
-          {/* About */}
+          {/* About - iOS Style */}
           <div className="p-6">
-            <h3 className="text-lg font-semibold mb-4">About</h3>
+            <h3 className="text-xl font-semibold mb-6 text-gray-800">About</h3>
             
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium">Version</p>
+                <p className="font-semibold text-gray-800">Version</p>
                 <p className="text-sm text-gray-500">1.0.0</p>
               </div>
             </div>
@@ -372,7 +381,7 @@ const WorldTour = () => {
     getCurrentLocation()
   }
 
-  // Stop location tracking
+  // Stop location monitoring
   const stopLocationTracking = () => {
     setIsMonitoring(false)
     setNearbyPOI(null)

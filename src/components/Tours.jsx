@@ -30,10 +30,11 @@ const Tours = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading tours...</p>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-blue-100 to-orange-50 flex items-center justify-center">
+        <div className="text-center space-y-6">
+          <div className="text-6xl text-blue-500">🌍</div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
+          <p className="text-gray-600 font-medium">Loading tours...</p>
         </div>
       </div>
     )
@@ -41,14 +42,14 @@ const Tours = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
-        <div className="text-center max-w-md">
-          <div className="text-6xl mb-4">⚠️</div>
-          <h2 className="text-xl font-semibold text-gray-800 mb-2">Oops!</h2>
-          <p className="text-gray-600 mb-6">{error}</p>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-blue-100 to-orange-50 flex items-center justify-center px-6">
+        <div className="text-center space-y-6">
+          <div className="text-6xl text-red-500">⚠️</div>
+          <h2 className="text-2xl font-bold text-gray-800">Oops!</h2>
+          <p className="text-gray-600 max-w-sm">{error}</p>
           <button
             onClick={handleRefresh}
-            className="bg-blue-500 text-white px-6 py-3 rounded-xl font-medium hover:bg-blue-600 transition-colors"
+            className="bg-blue-500 text-white px-6 py-3 rounded-2xl font-semibold hover:bg-blue-600 transition-colors"
           >
             Try Again
           </button>
@@ -58,34 +59,38 @@ const Tours = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm px-4 py-6">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-blue-100 to-orange-50">
+      {/* Header - iOS Style */}
+      <div className="bg-white/80 backdrop-blur-sm border-b border-white/20 px-6 py-8">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-gray-800">All Tours</h1>
+          <h1 className="text-3xl font-bold text-gray-800">All Tours</h1>
           <button
             onClick={handleRefresh}
-            className="text-blue-500 font-medium"
+            className="text-blue-500 font-semibold text-lg hover:text-blue-600 transition-colors"
           >
             Refresh
           </button>
         </div>
-      </header>
+      </div>
 
-      {/* Content */}
-      <div className="p-4">
+      {/* Tours List - iOS Style */}
+      <div className="p-6">
         {tours.length === 0 ? (
-          // Empty state
-          <div className="flex flex-col items-center justify-center py-20">
-            <div className="text-6xl mb-6">🌍</div>
-            <h2 className="text-xl font-semibold text-gray-800 mb-2">No Tours Available</h2>
-            <p className="text-gray-500 text-center max-w-sm">
+          <div className="text-center space-y-6 py-12">
+            <div className="text-6xl text-gray-400">🌍</div>
+            <h2 className="text-2xl font-bold text-gray-800">No Tours Available</h2>
+            <p className="text-gray-600 max-w-sm mx-auto">
               Tours will appear here once they're added to the database.
             </p>
+            <button
+              onClick={handleRefresh}
+              className="bg-blue-500 text-white px-6 py-3 rounded-2xl font-semibold hover:bg-blue-600 transition-colors"
+            >
+              Refresh
+            </button>
           </div>
         ) : (
-          // Tours grid
-          <div className="grid gap-4">
+          <div className="space-y-6">
             {tours.map((tour) => (
               <TourCard key={tour.id} tour={tour} />
             ))}
@@ -96,89 +101,140 @@ const Tours = () => {
   )
 }
 
-// Tour Card Component
 const TourCard = ({ tour }) => {
   const [isPlaying, setIsPlaying] = useState(false)
-  const [audio, setAudio] = useState(null)
+  const [currentTime, setCurrentTime] = useState(0)
+  const [audioLength] = useState(180) // Default 3 minutes
+  const speechRef = React.useRef(null)
+  const progressTimerRef = React.useRef(null)
 
-  const handlePlayAudio = () => {
-    if (!tour.audio_url) {
-      alert('No audio available for this tour.')
-      return
+  const formatTime = (seconds) => {
+    const minutes = Math.floor(seconds / 60)
+    const remainingSeconds = Math.floor(seconds % 60)
+    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`
+  }
+
+  const playTour = () => {
+    if (speechRef.current) {
+      window.speechSynthesis.cancel()
     }
 
-    if (isPlaying) {
-      // Stop audio
-      if (audio) {
-        audio.pause()
-        audio.currentTime = 0
-      }
-      setIsPlaying(false)
-      setAudio(null)
-    } else {
-      // Play audio
-      const newAudio = new Audio(tour.audio_url)
-      newAudio.addEventListener('ended', () => {
-        setIsPlaying(false)
-        setAudio(null)
-      })
-      newAudio.addEventListener('error', () => {
-        alert('Failed to play audio. Please check the audio URL.')
-        setIsPlaying(false)
-        setAudio(null)
-      })
-      
-      newAudio.play()
+    const utterance = new SpeechSynthesisUtterance(tour.description)
+    utterance.rate = 0.9
+    utterance.pitch = 1
+    utterance.volume = 1
+
+    utterance.onstart = () => {
       setIsPlaying(true)
-      setAudio(newAudio)
+      startProgressSimulation()
+    }
+    
+    utterance.onend = () => {
+      setIsPlaying(false)
+      setCurrentTime(0)
+      stopProgressSimulation()
+    }
+    
+    utterance.onerror = () => {
+      setIsPlaying(false)
+      setCurrentTime(0)
+      stopProgressSimulation()
+    }
+
+    speechRef.current = utterance
+    window.speechSynthesis.speak(utterance)
+  }
+
+  const stopTour = () => {
+    if (speechRef.current) {
+      window.speechSynthesis.cancel()
+      setIsPlaying(false)
+      setCurrentTime(0)
+      stopProgressSimulation()
     }
   }
 
+  const startProgressSimulation = () => {
+    progressTimerRef.current = setInterval(() => {
+      setCurrentTime(prev => {
+        if (prev < audioLength) {
+          return prev + 1
+        } else {
+          setIsPlaying(false)
+          stopProgressSimulation()
+          return prev
+        }
+      })
+    }, 1000)
+  }
+
+  const stopProgressSimulation = () => {
+    if (progressTimerRef.current) {
+      clearInterval(progressTimerRef.current)
+      progressTimerRef.current = null
+    }
+  }
+
+  React.useEffect(() => {
+    return () => {
+      if (speechRef.current) {
+        window.speechSynthesis.cancel()
+      }
+      stopProgressSimulation()
+    }
+  }, [])
+
+  const progress = (currentTime / audioLength) * 100
+
   return (
-    <div className="bg-white rounded-xl shadow-ios-soft overflow-hidden">
-      <div className="p-6">
-        {/* Tour Header */}
+    <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl border border-white/20 overflow-hidden">
+      {/* Tour Header - iOS Style */}
+      <div className="p-6 border-b border-gray-100">
         <div className="flex items-start justify-between mb-4">
           <div className="flex-1">
             <h3 className="text-xl font-bold text-gray-800 mb-2">{tour.title}</h3>
-            <p className="text-gray-600 mb-3">{tour.location}</p>
+            <p className="text-gray-600 font-medium">{tour.location}</p>
           </div>
-          <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center ml-4">
-            <span className="text-white text-lg">🎧</span>
+          <div className="text-4xl ml-4">🌍</div>
+        </div>
+        
+        <p className="text-gray-600 leading-relaxed">{tour.description}</p>
+      </div>
+
+      {/* Audio Controls - iOS Style */}
+      <div className="p-6">
+        {/* Progress Bar */}
+        <div className="space-y-3 mb-6">
+          <div className="w-full bg-gray-200 rounded-full h-2">
+            <div 
+              className="bg-blue-500 h-2 rounded-full transition-all duration-300"
+              style={{ width: `${progress}%` }}
+            ></div>
+          </div>
+          <div className="flex justify-between text-sm text-gray-500">
+            <span>{formatTime(currentTime)}</span>
+            <span>{formatTime(audioLength)}</span>
           </div>
         </div>
 
-        {/* Description */}
-        <p className="text-gray-700 leading-relaxed mb-6">
-          {tour.description}
-        </p>
-
-        {/* Audio Controls */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <button
-              onClick={handlePlayAudio}
-              disabled={!tour.audio_url}
-              className={`flex items-center space-x-2 px-4 py-3 rounded-xl font-medium transition-colors ${
-                tour.audio_url
-                  ? isPlaying
-                    ? 'bg-red-500 text-white hover:bg-red-600'
-                    : 'bg-blue-500 text-white hover:bg-blue-600'
-                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-              }`}
-            >
-              <span className="text-lg">
-                {isPlaying ? '⏸️' : '▶️'}
-              </span>
-              <span>
-                {isPlaying ? 'Stop' : 'Play Audio'}
-              </span>
-            </button>
-          </div>
-
-          {!tour.audio_url && (
-            <span className="text-sm text-gray-500">No audio available</span>
-          )}
+        {/* Playback Controls */}
+        <div className="flex items-center justify-center space-x-8">
+          <button className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors">
+            <span className="text-xl">⏮️</span>
+          </button>
+          
+          <button
+            onClick={isPlaying ? stopTour : playTour}
+            className="w-16 h-16 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all"
+          >
+            <span className="text-2xl text-white">
+              {isPlaying ? '⏸️' : '▶️'}
+            </span>
+          </button>
+          
+          <button className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors">
+            <span className="text-xl">⏭️</span>
+          </button>
         </div>
       </div>
     </div>
