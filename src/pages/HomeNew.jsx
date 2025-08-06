@@ -62,6 +62,26 @@ const HomeNew = () => {
     return Math.round(meters * 3.281)
   }
 
+  // Calculate direction between two points
+  const getDirection = (userLat, userLon, poiLat, poiLon) => {
+    const deltaLon = poiLon - userLon
+    const deltaLat = poiLat - userLat
+    
+    const angle = Math.atan2(deltaLon, deltaLat) * 180 / Math.PI
+    
+    // Convert angle to cardinal direction
+    if (angle >= -22.5 && angle < 22.5) return 'North'
+    if (angle >= 22.5 && angle < 67.5) return 'Northeast'
+    if (angle >= 67.5 && angle < 112.5) return 'East'
+    if (angle >= 112.5 && angle < 157.5) return 'Southeast'
+    if (angle >= 157.5 || angle < -157.5) return 'South'
+    if (angle >= -157.5 && angle < -112.5) return 'Southwest'
+    if (angle >= -112.5 && angle < -67.5) return 'West'
+    if (angle >= -67.5 && angle < -22.5) return 'Northwest'
+    
+    return 'North' // Default fallback
+  }
+
   // Get the closest POI to user's location
   const getClosestPOI = (userLat, userLon) => {
     if (!userLat || !userLon || pois.length === 0) return null
@@ -95,7 +115,8 @@ const HomeNew = () => {
           ...poi, 
           distance,
           coordinate: { latitude: poiLat, longitude: poiLon },
-          radius: 50 // Default radius in meters
+          radius: 50, // Default radius in meters
+          direction: getDirection(userLat, userLon, poiLat, poiLon)
         }
       }
     })
@@ -372,6 +393,7 @@ const HomeNew = () => {
     // Show closest POI if out of range
     if (closestPOI) {
       const distanceInFeet = metersToFeet(closestPOI.distance)
+      const direction = closestPOI.direction
       
       return (
         <motion.div
@@ -402,7 +424,7 @@ const HomeNew = () => {
                   </div>
                   
                   <p className="text-gray-600 text-sm font-medium">
-                    {distanceInFeet} ft away
+                    {distanceInFeet} ft away, {direction}
                   </p>
                   
                   <div className="flex items-center justify-center space-x-2 pt-2">
@@ -419,6 +441,48 @@ const HomeNew = () => {
 
     // Show no POIs available state
     if (pois.length === 0 && !poisLoading && !poisError) {
+      // Try to get closest POI even if none are in range
+      const closestPOI = userLocation ? getClosestPOI(userLocation.latitude, userLocation.longitude) : null
+      
+      if (closestPOI) {
+        const distanceInFeet = metersToFeet(closestPOI.distance)
+        const direction = closestPOI.direction
+        
+        return (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+            className="w-full max-w-sm"
+          >
+            <Card className="bg-white/80 backdrop-blur-sm border-white/30 shadow-lg">
+              <CardContent className="p-6">
+                <div className="text-center space-y-4">
+                  <div className="flex items-center justify-center space-x-2">
+                    <MapPin className="text-gray-500 w-5 h-5" />
+                    <span className="text-gray-600 font-medium">Closest POI</span>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <h3 className="text-lg font-semibold text-gray-800">
+                      {closestPOI.name}
+                    </h3>
+                    <p className="text-gray-600 text-sm font-medium">
+                      {distanceInFeet} ft away, {direction}
+                    </p>
+                  </div>
+                  
+                  <p className="text-gray-500 text-sm">
+                    Walk {direction.toLowerCase()} to get closer to this location.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        )
+      }
+      
+      // Fallback if no POIs at all
       return (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
