@@ -4,7 +4,6 @@ import WorldTour from './components/WorldTour'
 import PastTours from './components/PastTours'
 import Tours from './components/Tours'
 import About from './components/About'
-import VersionCheck from './components/VersionCheck'
 
 function App() {
   const [currentTab, setCurrentTab] = useState('home')
@@ -12,21 +11,17 @@ function App() {
   return (
     <Router>
       <div className="min-h-screen bg-gray-50">
-        <VersionCheck />
-        <div className="fixed top-4 right-4 bg-green-500 text-white px-3 py-1 rounded-lg text-sm z-50">
-          TEST BUILD - WORKING
-        </div>
         <Routes>
           <Route path="/" element={
             <div className="flex flex-col h-screen">
-              {/* Main Content - iOS Style Updated */}
+              {/* Main Content - iOS Style */}
               <div className="flex-1 overflow-hidden">
                 {currentTab === 'home' && <WorldTour />}
                 {currentTab === 'past-tours' && <PastTours />}
                 {currentTab === 'tours' && <Tours />}
               </div>
 
-              {/* Tab Navigation - iOS Style Updated - FORCE DEPLOYMENT */}
+              {/* Tab Navigation - iOS Style */}
               <div className="bg-white border-t border-gray-200 px-4 py-2">
                 <div className="flex justify-around">
                   <button
@@ -38,7 +33,7 @@ function App() {
                     }`}
                   >
                     <span className="text-xl mb-1">🏠</span>
-                    <span className="text-xs font-medium">Home - iOS</span>
+                    <span className="text-xs font-medium">Home</span>
                   </button>
                   
                   <button
@@ -50,7 +45,7 @@ function App() {
                     }`}
                   >
                     <span className="text-xl mb-1">🌍</span>
-                    <span className="text-xs font-medium">Tours - iOS</span>
+                    <span className="text-xs font-medium">Tours</span>
                   </button>
                   
                   <button
@@ -62,7 +57,7 @@ function App() {
                     }`}
                   >
                     <span className="text-xl mb-1">📋</span>
-                    <span className="text-xs font-medium">History - iOS</span>
+                    <span className="text-xs font-medium">History</span>
                   </button>
                 </div>
               </div>

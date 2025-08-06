@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import toursData from '../data/tours.json'
 
-// Loading Screen Component - iOS Style v2.0 - DEPLOYMENT FORCE
+// Loading Screen Component - iOS Style
 const LoadingView = () => {
   const [isAnimating, setIsAnimating] = useState(false)
 
@@ -12,19 +12,19 @@ const LoadingView = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-blue-100 to-orange-50 flex items-center justify-center">
-      <div className="text-center space-y-8">
-        {/* Animated Globe Icon - FORCE DEPLOYMENT */}
-        <div className={`text-8xl text-blue-500 transition-all duration-2000 ${isAnimating ? 'scale-110' : 'scale-100'}`}>
+      <div className="text-center space-y-8 animate-fade-in">
+        {/* Animated Globe Icon */}
+        <div className={`text-8xl text-blue-500 transition-all duration-2000 ${isAnimating ? 'scale-110 animate-bounce-gentle' : 'scale-100'}`}>
           🌍
         </div>
         
         {/* App Name with Fade-in Animation */}
-        <h1 className={`text-5xl font-bold text-gray-800 transition-all duration-1000 ${isAnimating ? 'opacity-100' : 'opacity-0'}`}>
-          World Tour - iOS Style
+        <h1 className={`text-5xl font-bold text-gray-800 transition-all duration-1000 ${isAnimating ? 'opacity-100 animate-slide-up' : 'opacity-0'}`}>
+          World Tour
         </h1>
         
         {/* Loading Spinner */}
-        <div className={`flex justify-center transition-all duration-1000 ${isAnimating ? 'opacity-100' : 'opacity-0'}`}>
+        <div className={`flex justify-center transition-all duration-1000 ${isAnimating ? 'opacity-100 animate-pulse-slow' : 'opacity-0'}`}>
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
         </div>
       </div>
@@ -32,7 +32,7 @@ const LoadingView = () => {
   )
 }
 
-// Home View Component - iOS Style v2.0 - DEPLOYMENT FORCE
+// Home View Component - iOS Style
 const HomeView = ({ locationManager, onStartTour, onOpenSettings }) => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-blue-100 to-orange-50">
@@ -40,30 +40,30 @@ const HomeView = ({ locationManager, onStartTour, onOpenSettings }) => {
         {/* Settings Button - iOS Style */}
         <button
           onClick={onOpenSettings}
-          className="absolute top-6 right-6 w-11 h-11 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg"
+          className="absolute top-6 right-6 w-11 h-11 bg-white/20 backdrop-blur-ios rounded-full flex items-center justify-center shadow-ios-medium hover:shadow-ios-strong transition-all duration-300 transform hover:scale-110 active:scale-95"
         >
           <span className="text-gray-600 text-xl">⚙️</span>
         </button>
 
-        <div className="text-center space-y-12 mb-12">
-          {/* Large Globe Icon - FORCE DEPLOYMENT */}
-          <div className="text-8xl text-blue-500 mb-6">🌍</div>
+        <div className="text-center space-y-12 mb-12 animate-fade-in">
+          {/* Large Globe Icon */}
+          <div className="text-8xl text-blue-500 mb-6 animate-bounce-gentle">🌍</div>
           
           {/* App Title */}
-          <h1 className="text-5xl font-bold text-gray-800">World Tour - iOS Style</h1>
+          <h1 className="text-5xl font-bold text-gray-800 animate-slide-up">World Tour</h1>
         </div>
 
         {/* Location Status - iOS Style */}
         {locationManager.isMonitoring && (
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 mb-8 shadow-lg border border-white/20">
+          <div className="bg-white/80 backdrop-blur-ios rounded-2xl p-6 mb-8 shadow-ios-medium border border-white/20 animate-scale-in">
             <div className="flex items-center justify-center space-x-3 mb-3">
-              <span className="text-green-500 text-xl">📍</span>
+              <span className="text-ios-success text-xl animate-pulse-slow">📍</span>
               <span className="text-gray-600 font-medium">Monitoring {toursData.pois.length} locations</span>
             </div>
             {locationManager.activePOI && (
-              <div className="text-center">
-                <p className="text-blue-600 font-medium">Nearby: {locationManager.activePOI.poiName}</p>
-                <p className="text-gray-500 text-sm">Tap to start tour</p>
+              <div className="text-center animate-fade-in">
+                <p className="text-ios-primary font-medium">Nearby: {locationManager.activePOI.poiName}</p>
+                <p className="text-ios-secondary text-sm">Tap to start tour</p>
               </div>
             )}
           </div>
@@ -72,7 +72,7 @@ const HomeView = ({ locationManager, onStartTour, onOpenSettings }) => {
         {/* Start Tour Button - iOS Style */}
         <button
           onClick={onStartTour}
-          className="w-full max-w-sm bg-gradient-to-r from-blue-500 to-blue-600 text-white py-6 px-8 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 flex items-center justify-center space-x-4 mb-8"
+          className="w-full max-w-sm bg-gradient-ios-blue text-white py-6 px-8 rounded-2xl shadow-ios-strong hover:shadow-ios-strong transition-all duration-300 flex items-center justify-center space-x-4 mb-8 transform hover:scale-105 active:scale-95 animate-slide-up"
         >
           <span className="text-2xl">
             {locationManager.isLocationEnabled ? '🎧' : '📍'}
@@ -83,7 +83,7 @@ const HomeView = ({ locationManager, onStartTour, onOpenSettings }) => {
         </button>
 
         {/* Subtitle - iOS Style */}
-        <p className="text-center text-gray-600 text-lg max-w-sm leading-relaxed">
+        <p className="text-center text-ios-secondary text-lg max-w-sm leading-relaxed animate-fade-in">
           {locationManager.isLocationEnabled 
             ? 'Connect your headphones and start walking—World Tour will guide you.'
             : 'Enable location to discover nearby landmarks'
