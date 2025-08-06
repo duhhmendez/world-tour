@@ -13,6 +13,9 @@ function App() {
     <Router>
       <div className="min-h-screen bg-gray-50">
         <VersionCheck />
+        <div className="fixed top-4 right-4 bg-green-500 text-white px-3 py-1 rounded-lg text-sm z-50">
+          TEST BUILD - WORKING
+        </div>
         <Routes>
           <Route path="/" element={
             <div className="flex flex-col h-screen">
