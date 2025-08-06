@@ -190,6 +190,17 @@ const HomeNew = () => {
       return
     }
 
+    // Debug logging
+    console.log('Location Update:', {
+      userLocation: { lat: userLat, lon: userLon },
+      closestPOI: {
+        name: closest.name,
+        distance: closest.distance,
+        direction: closest.direction,
+        inRange: isWithinRange(closest, closest.distance)
+      }
+    })
+
     setClosestPOI(closest)
 
     if (isWithinRange(closest, closest.distance)) {
@@ -205,9 +216,9 @@ const HomeNew = () => {
       setLocationEnabled(true)
       setIsDetecting(true)
       
-      // Simulate user location (near Empire State Building)
+      // Simulate user location (slightly south of Empire State Building to show distance)
       const mockUserLocation = {
-        latitude: 40.7484,
+        latitude: 40.7470, // About 150 meters south of Empire State Building
         longitude: -73.9857
       }
       setUserLocation(mockUserLocation)
@@ -240,9 +251,9 @@ const HomeNew = () => {
     if (!locationEnabled || !userLocation) return
 
     const locationUpdateInterval = setInterval(() => {
-      // Simulate user movement
-      const newLat = userLocation.latitude + (Math.random() - 0.5) * 0.001
-      const newLon = userLocation.longitude + (Math.random() - 0.5) * 0.001
+      // Simulate realistic user movement (smaller increments)
+      const newLat = userLocation.latitude + (Math.random() - 0.5) * 0.0001 // Smaller movement
+      const newLon = userLocation.longitude + (Math.random() - 0.5) * 0.0001
       const newLocation = { latitude: newLat, longitude: newLon }
       
       setUserLocation(newLocation)
@@ -251,25 +262,57 @@ const HomeNew = () => {
       if (pois.length > 0) {
         updatePOIStatus(newLat, newLon)
       }
-    }, 5000) // Update every 5 seconds
+    }, 10000) // Update every 10 seconds instead of 5
 
     return () => clearInterval(locationUpdateInterval)
   }, [locationEnabled, userLocation, pois])
 
   const handleStartTour = () => {
     if (!locationEnabled) {
+      // Try to get real location first
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
           (position) => {
+            console.log('Real location obtained:', position.coords)
             setLocationEnabled(true)
             setUserLocation({
               latitude: position.coords.latitude,
               longitude: position.coords.longitude
             })
-            updatePOIStatus(position.coords.latitude, position.coords.longitude)
+            if (pois.length > 0) {
+              updatePOIStatus(position.coords.latitude, position.coords.longitude)
+            }
           },
-          () => console.log('Location permission denied')
+          (error) => {
+            console.log('Location permission denied or error:', error)
+            // Fall back to simulated location
+            const mockLocation = {
+              latitude: 40.7470,
+              longitude: -73.9857
+            }
+            setLocationEnabled(true)
+            setUserLocation(mockLocation)
+            if (pois.length > 0) {
+              updatePOIStatus(mockLocation.latitude, mockLocation.longitude)
+            }
+          },
+          {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 60000
+          }
         )
+      } else {
+        // Fall back to simulated location
+        const mockLocation = {
+          latitude: 40.7470,
+          longitude: -73.9857
+        }
+        setLocationEnabled(true)
+        setUserLocation(mockLocation)
+        if (pois.length > 0) {
+          updatePOIStatus(mockLocation.latitude, mockLocation.longitude)
+        }
       }
     } else if (activePOI) {
       setShowActiveTour(true)
@@ -645,6 +688,38 @@ const HomeNew = () => {
               <LocationStatusPanel />
             )}
           </div>
+
+          {/* Debug Location Info (only in development) */}
+          {process.env.NODE_ENV === 'development' && userLocation && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.6, ease: "easeOut", delay: 0.8 }}
+              className="w-full max-w-sm mt-4"
+            >
+              <Card className="bg-gray-100/80 backdrop-blur-sm border-gray-200/30 shadow-sm">
+                <CardContent className="p-4">
+                  <div className="text-center space-y-2">
+                    <div className="flex items-center justify-center space-x-2">
+                      <MapPin className="text-gray-500 w-4 h-4" />
+                      <span className="text-gray-600 text-sm font-medium">Debug Location</span>
+                    </div>
+                    <p className="text-gray-500 text-xs">
+                      Lat: {userLocation.latitude.toFixed(6)}
+                    </p>
+                    <p className="text-gray-500 text-xs">
+                      Lon: {userLocation.longitude.toFixed(6)}
+                    </p>
+                    {closestPOI && (
+                      <p className="text-gray-500 text-xs">
+                        Closest: {closestPOI.name} ({metersToFeet(closestPOI.distance)} ft {closestPOI.direction})
+                      </p>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          )}
 
           {/* Bottom Section */}
           <div className="w-full max-w-sm space-y-8">
