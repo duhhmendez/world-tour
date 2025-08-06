@@ -29,61 +29,10 @@ const HomeNew = () => {
         setPoisLoading(true)
         setPoisError(null)
         const poisData = await fetchPOIs()
-        
-        // If no POIs from Supabase, add some mock POIs for testing
-        if (poisData.length === 0) {
-          console.log('No POIs from Supabase, using mock data for testing')
-          const mockPois = [
-            {
-              id: "empire-state",
-              name: "Empire State Building",
-              script: "Standing 1,454 feet tall, the Empire State Building is an Art Deco masterpiece and one of New York's most iconic landmarks.",
-              location: "40.7484,-73.9857"
-            },
-            {
-              id: "central-park",
-              name: "Central Park",
-              script: "A vast urban oasis covering 843 acres, Central Park offers lakes, walking trails, and cultural landmarks in the heart of Manhattan.",
-              location: "40.7829,-73.9654"
-            },
-            {
-              id: "times-square",
-              name: "Times Square",
-              script: "The bustling heart of Manhattan, Times Square is known for its bright lights, entertainment, and as the crossroads of the world.",
-              location: "40.7580,-73.9855"
-            }
-          ]
-          setPois(mockPois)
-        } else {
-          setPois(poisData)
-        }
+        setPois(poisData)
       } catch (error) {
         console.error('Failed to load POIs:', error)
         setPoisError('Failed to load points of interest')
-        
-        // Add mock POIs on error for testing
-        console.log('Using mock POIs due to error')
-        const mockPois = [
-          {
-            id: "empire-state",
-            name: "Empire State Building",
-            script: "Standing 1,454 feet tall, the Empire State Building is an Art Deco masterpiece and one of New York's most iconic landmarks.",
-            location: "40.7484,-73.9857"
-          },
-          {
-            id: "central-park",
-            name: "Central Park",
-            script: "A vast urban oasis covering 843 acres, Central Park offers lakes, walking trails, and cultural landmarks in the heart of Manhattan.",
-            location: "40.7829,-73.9654"
-          },
-          {
-            id: "times-square",
-            name: "Times Square",
-            script: "The bustling heart of Manhattan, Times Square is known for its bright lights, entertainment, and as the crossroads of the world.",
-            location: "40.7580,-73.9855"
-          }
-        ]
-        setPois(mockPois)
       } finally {
         setPoisLoading(false)
       }
@@ -141,7 +90,7 @@ const HomeNew = () => {
     let minDistance = Infinity
 
     pois.forEach(poi => {
-      // Parse coordinates from the location field or use default coordinates
+      // Parse coordinates from the location field
       // Assuming location field contains "latitude,longitude" format
       let poiLat, poiLon
       
@@ -150,9 +99,8 @@ const HomeNew = () => {
         poiLat = lat
         poiLon = lon
       } else {
-        // Fallback coordinates for development
-        poiLat = 40.7484
-        poiLon = -73.9857
+        // Skip POIs without valid coordinates
+        return
       }
 
       const distance = getDistanceInMeters(
@@ -190,17 +138,6 @@ const HomeNew = () => {
       return
     }
 
-    // Debug logging
-    console.log('Location Update:', {
-      userLocation: { lat: userLat, lon: userLon },
-      closestPOI: {
-        name: closest.name,
-        distance: closest.distance,
-        direction: closest.direction,
-        inRange: isWithinRange(closest, closest.distance)
-      }
-    })
-
     setClosestPOI(closest)
 
     if (isWithinRange(closest, closest.distance)) {
@@ -210,34 +147,11 @@ const HomeNew = () => {
     }
   }
 
-  // Simulate location permission and POI detection
+  // Real location detection (no simulation)
   useEffect(() => {
-    const locationTimer = setTimeout(() => {
-      setLocationEnabled(true)
-      setIsDetecting(true)
-      
-      // Simulate user location (slightly south of Empire State Building to show distance)
-      const mockUserLocation = {
-        latitude: 40.7470, // About 150 meters south of Empire State Building
-        longitude: -73.9857
-      }
-      setUserLocation(mockUserLocation)
-      
-      // Only update POI status if POIs are loaded
-      if (pois.length > 0) {
-        updatePOIStatus(mockUserLocation.latitude, mockUserLocation.longitude)
-      }
-    }, 2000)
-
-    const poiTimer = setTimeout(() => {
-      setIsDetecting(false)
-    }, 4000)
-
-    return () => {
-      clearTimeout(locationTimer)
-      clearTimeout(poiTimer)
-    }
-  }, []) // Remove pois dependency to ensure location simulation always runs
+    // Don't auto-enable location - wait for user to click "Start Tour"
+    // This ensures we get real location permission
+  }, [])
 
   // Update POI status when POIs are loaded
   useEffect(() => {
@@ -246,30 +160,43 @@ const HomeNew = () => {
     }
   }, [pois, locationEnabled, userLocation])
 
-  // Real-time location updates (simulated)
+  // Real-time location updates (only when real location is enabled)
   useEffect(() => {
     if (!locationEnabled || !userLocation) return
 
     const locationUpdateInterval = setInterval(() => {
-      // Simulate realistic user movement (smaller increments)
-      const newLat = userLocation.latitude + (Math.random() - 0.5) * 0.0001 // Smaller movement
-      const newLon = userLocation.longitude + (Math.random() - 0.5) * 0.0001
-      const newLocation = { latitude: newLat, longitude: newLon }
-      
-      setUserLocation(newLocation)
-      
-      // Only update POI status if POIs are loaded
-      if (pois.length > 0) {
-        updatePOIStatus(newLat, newLon)
+      // Get fresh location from device
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const newLocation = {
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude
+            }
+            setUserLocation(newLocation)
+            
+            if (pois.length > 0) {
+              updatePOIStatus(newLocation.latitude, newLocation.longitude)
+            }
+          },
+          (error) => {
+            console.log('Location update failed:', error)
+          },
+          {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 30000 // 30 seconds
+          }
+        )
       }
-    }, 10000) // Update every 10 seconds instead of 5
+    }, 30000) // Update every 30 seconds
 
     return () => clearInterval(locationUpdateInterval)
   }, [locationEnabled, userLocation, pois])
 
   const handleStartTour = () => {
     if (!locationEnabled) {
-      // Try to get real location first
+      // Get real location with high accuracy
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
           (position) => {
@@ -285,16 +212,7 @@ const HomeNew = () => {
           },
           (error) => {
             console.log('Location permission denied or error:', error)
-            // Fall back to simulated location
-            const mockLocation = {
-              latitude: 40.7470,
-              longitude: -73.9857
-            }
-            setLocationEnabled(true)
-            setUserLocation(mockLocation)
-            if (pois.length > 0) {
-              updatePOIStatus(mockLocation.latitude, mockLocation.longitude)
-            }
+            setPoisError('Location access is required to use this app')
           },
           {
             enableHighAccuracy: true,
@@ -303,16 +221,7 @@ const HomeNew = () => {
           }
         )
       } else {
-        // Fall back to simulated location
-        const mockLocation = {
-          latitude: 40.7470,
-          longitude: -73.9857
-        }
-        setLocationEnabled(true)
-        setUserLocation(mockLocation)
-        if (pois.length > 0) {
-          updatePOIStatus(mockLocation.latitude, mockLocation.longitude)
-        }
+        setPoisError('Location services are not available on this device')
       }
     } else if (activePOI) {
       setShowActiveTour(true)
@@ -688,38 +597,6 @@ const HomeNew = () => {
               <LocationStatusPanel />
             )}
           </div>
-
-          {/* Debug Location Info (only in development) */}
-          {process.env.NODE_ENV === 'development' && userLocation && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.6, ease: "easeOut", delay: 0.8 }}
-              className="w-full max-w-sm mt-4"
-            >
-              <Card className="bg-gray-100/80 backdrop-blur-sm border-gray-200/30 shadow-sm">
-                <CardContent className="p-4">
-                  <div className="text-center space-y-2">
-                    <div className="flex items-center justify-center space-x-2">
-                      <MapPin className="text-gray-500 w-4 h-4" />
-                      <span className="text-gray-600 text-sm font-medium">Debug Location</span>
-                    </div>
-                    <p className="text-gray-500 text-xs">
-                      Lat: {userLocation.latitude.toFixed(6)}
-                    </p>
-                    <p className="text-gray-500 text-xs">
-                      Lon: {userLocation.longitude.toFixed(6)}
-                    </p>
-                    {closestPOI && (
-                      <p className="text-gray-500 text-xs">
-                        Closest: {closestPOI.name} ({metersToFeet(closestPOI.distance)} ft {closestPOI.direction})
-                      </p>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
-          )}
 
           {/* Bottom Section */}
           <div className="w-full max-w-sm space-y-8">
