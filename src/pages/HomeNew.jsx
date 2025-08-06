@@ -152,9 +152,32 @@ const HomeNew = () => {
 
   // Real location detection (no simulation)
   useEffect(() => {
-    // Don't auto-enable location - wait for user to click "Start Tour"
-    // This ensures we get real location permission
-  }, [])
+    // Check if location permission is already granted
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          console.log('Location permission already granted:', position.coords)
+          setLocationEnabled(true)
+          setUserLocation({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude
+          })
+          if (pois.length > 0) {
+            updatePOIStatus(position.coords.latitude, position.coords.longitude)
+          }
+        },
+        (error) => {
+          console.log('Location permission not granted yet:', error)
+          // Don't set error here - user will click "Start Tour" to request permission
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 5000,
+          maximumAge: 60000
+        }
+      )
+    }
+  }, [pois]) // Add pois as dependency so location updates when POIs load
 
   // Update POI status when POIs are loaded
   useEffect(() => {
@@ -201,6 +224,7 @@ const HomeNew = () => {
     if (!locationEnabled) {
       // Get real location with high accuracy
       if (navigator.geolocation) {
+        console.log('Requesting location permission...')
         navigator.geolocation.getCurrentPosition(
           (position) => {
             console.log('Real location obtained:', position.coords)
@@ -215,7 +239,19 @@ const HomeNew = () => {
           },
           (error) => {
             console.log('Location permission denied or error:', error)
-            setPoisError('Location access is required to use this app')
+            switch(error.code) {
+              case error.PERMISSION_DENIED:
+                setPoisError('Location access is required. Please allow location access in your browser settings.')
+                break
+              case error.POSITION_UNAVAILABLE:
+                setPoisError('Location information is unavailable. Please try again.')
+                break
+              case error.TIMEOUT:
+                setPoisError('Location request timed out. Please try again.')
+                break
+              default:
+                setPoisError('Location access is required to use this app')
+            }
           },
           {
             enableHighAccuracy: true,
@@ -254,7 +290,7 @@ const HomeNew = () => {
     } else if (poisError) {
       return "Unable to load points of interest"
     } else if (!locationEnabled) {
-      return "Enable location to discover nearby landmarks"
+      return "Click 'Start Tour' to enable location and discover nearby landmarks"
     } else if (isDetecting) {
       return "Scanning for nearby landmarks..."
     } else if (activePOI) {
