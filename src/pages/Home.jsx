@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { BiWorld, BiMapPin, BiVolumeFull, BiCog } from 'react-icons/bi'
 import ActiveTour from './ActiveTour'
+import Settings from './Settings'
 
 // Location Status Panel Component
 const LocationStatusPanel = ({ locationEnabled, activePOI, monitoringCount }) => {
@@ -52,117 +53,6 @@ const StartTourButton = ({ locationEnabled, onStartTour }) => {
       <buttonIcon className="text-2xl" />
       <span className="text-xl font-semibold">{buttonText}</span>
     </motion.button>
-  )
-}
-
-// Settings Modal Component
-const SettingsModal = ({ isOpen, onClose }) => {
-  const [voiceGender, setVoiceGender] = useState('neutral')
-  const [voiceTone, setVoiceTone] = useState('friendly')
-  const [backgroundAmbience, setBackgroundAmbience] = useState(true)
-
-  return (
-    <AnimatePresence>
-      {isOpen && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-          onClick={onClose}
-        >
-          <motion.div
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.9, opacity: 0 }}
-            transition={{ duration: 0.3, ease: "easeOut" }}
-            className="bg-white/95 backdrop-blur-ios rounded-3xl shadow-ios-strong w-full max-w-md overflow-hidden"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Header */}
-            <div className="flex justify-between items-center p-6 border-b border-gray-100">
-              <button onClick={onClose} className="text-ios-primary font-semibold text-lg">
-                Done
-              </button>
-              <h2 className="text-xl font-bold text-gray-800">Settings</h2>
-              <div className="w-12"></div>
-            </div>
-
-            {/* Content */}
-            <div className="p-6 space-y-6">
-              {/* Voice Settings */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-gray-800">Voice Settings</h3>
-                
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="font-semibold text-gray-800">Voice Gender</p>
-                      <p className="text-sm text-gray-500">Choose the voice for audio guides</p>
-                    </div>
-                    <select 
-                      value={voiceGender} 
-                      onChange={(e) => setVoiceGender(e.target.value)}
-                      className="border border-gray-200 rounded-xl px-4 py-2 bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    >
-                      <option value="male">Male</option>
-                      <option value="female">Female</option>
-                      <option value="neutral">Neutral</option>
-                    </select>
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="font-semibold text-gray-800">Voice Tone</p>
-                      <p className="text-sm text-gray-500">Select the tone of voice narration</p>
-                    </div>
-                    <select 
-                      value={voiceTone} 
-                      onChange={(e) => setVoiceTone(e.target.value)}
-                      className="border border-gray-200 rounded-xl px-4 py-2 bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    >
-                      <option value="friendly">Friendly</option>
-                      <option value="dramatic">Dramatic</option>
-                      <option value="playful">Playful</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-
-              {/* Audio Settings */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-gray-800">Audio Settings</h3>
-                
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-semibold text-gray-800">Background Ambience</p>
-                    <p className="text-sm text-gray-500">Play ambient sounds during tours</p>
-                  </div>
-                  <input
-                    type="checkbox"
-                    checked={backgroundAmbience}
-                    onChange={(e) => setBackgroundAmbience(e.target.checked)}
-                    className="w-6 h-6 text-blue-500 rounded focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-              </div>
-
-              {/* About */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-gray-800">About</h3>
-                
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-semibold text-gray-800">Version</p>
-                    <p className="text-sm text-gray-500">1.0.0</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>
   )
 }
 
@@ -309,10 +199,11 @@ const Home = () => {
       </div>
 
       {/* Settings Modal */}
-      <SettingsModal 
-        isOpen={showSettings}
-        onClose={handleCloseSettings}
-      />
+      <AnimatePresence>
+        {showSettings && (
+          <Settings onClose={handleCloseSettings} />
+        )}
+      </AnimatePresence>
     </div>
   )
 }
