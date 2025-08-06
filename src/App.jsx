@@ -4,6 +4,7 @@ import WorldTour from './components/WorldTour'
 import PastTours from './components/PastTours'
 import Tours from './components/Tours'
 import About from './components/About'
+import VersionCheck from './components/VersionCheck'
 
 function App() {
   const [currentTab, setCurrentTab] = useState('home')
@@ -11,6 +12,7 @@ function App() {
   return (
     <Router>
       <div className="min-h-screen bg-gray-50">
+        <VersionCheck />
         <Routes>
           <Route path="/" element={
             <div className="flex flex-col h-screen">
