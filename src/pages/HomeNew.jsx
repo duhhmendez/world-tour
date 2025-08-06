@@ -8,47 +8,122 @@ import SettingsNew from './SettingsNew'
 
 const HomeNew = () => {
   const [locationEnabled, setLocationEnabled] = useState(false)
+  const [userLocation, setUserLocation] = useState(null)
   const [activePOI, setActivePOI] = useState(null)
+  const [closestPOI, setClosestPOI] = useState(null)
   const [showSettings, setShowSettings] = useState(false)
   const [showActiveTour, setShowActiveTour] = useState(false)
   const [isDetecting, setIsDetecting] = useState(false)
   const [monitoringCount] = useState(3)
 
-  // Mock POI data - in real app, this would come from geolocation API
-  const mockPOIs = [
+  // Mock POI data with coordinates
+  const pois = [
     {
       id: "empire-state",
       title: "Empire State Building",
       description: "Standing 1,454 feet tall, the Empire State Building is an Art Deco masterpiece and one of New York's most iconic landmarks.",
       coordinate: { latitude: 40.7484, longitude: -73.9857 },
-      radius: 50
+      radius: 50 // meters
     },
     {
       id: "central-park",
       title: "Central Park",
       description: "A vast urban oasis covering 843 acres, Central Park offers lakes, walking trails, and cultural landmarks in the heart of Manhattan.",
       coordinate: { latitude: 40.7829, longitude: -73.9654 },
-      radius: 100
+      radius: 100 // meters
     },
     {
       id: "times-square",
       title: "Times Square",
       description: "The bustling heart of Manhattan, Times Square is known for its bright lights, entertainment, and as the crossroads of the world.",
       coordinate: { latitude: 40.7580, longitude: -73.9855 },
-      radius: 75
+      radius: 75 // meters
     }
   ]
+
+  // Haversine formula to calculate distance between two points
+  const getDistanceInMeters = (lat1, lon1, lat2, lon2) => {
+    const R = 6371e3 // Earth's radius in meters
+    const φ1 = lat1 * Math.PI / 180
+    const φ2 = lat2 * Math.PI / 180
+    const Δφ = (lat2 - lat1) * Math.PI / 180
+    const Δλ = (lon2 - lon1) * Math.PI / 180
+
+    const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+              Math.cos(φ1) * Math.cos(φ2) *
+              Math.sin(Δλ / 2) * Math.sin(Δλ / 2)
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+
+    return R * c
+  }
+
+  // Convert meters to feet
+  const metersToFeet = (meters) => {
+    return Math.round(meters * 3.281)
+  }
+
+  // Get the closest POI to user's location
+  const getClosestPOI = (userLat, userLon) => {
+    if (!userLat || !userLon) return null
+
+    let closest = null
+    let minDistance = Infinity
+
+    pois.forEach(poi => {
+      const distance = getDistanceInMeters(
+        userLat, userLon,
+        poi.coordinate.latitude, poi.coordinate.longitude
+      )
+      
+      if (distance < minDistance) {
+        minDistance = distance
+        closest = { ...poi, distance }
+      }
+    })
+
+    return closest
+  }
+
+  // Check if user is within range of a POI
+  const isWithinRange = (poi, distance) => {
+    return distance <= poi.radius
+  }
+
+  // Update POI status based on user location
+  const updatePOIStatus = (userLat, userLon) => {
+    const closest = getClosestPOI(userLat, userLon)
+    
+    if (!closest) {
+      setClosestPOI(null)
+      setActivePOI(null)
+      return
+    }
+
+    setClosestPOI(closest)
+
+    if (isWithinRange(closest, closest.distance)) {
+      setActivePOI(closest)
+    } else {
+      setActivePOI(null)
+    }
+  }
 
   // Simulate location permission and POI detection
   useEffect(() => {
     const locationTimer = setTimeout(() => {
       setLocationEnabled(true)
       setIsDetecting(true)
+      
+      // Simulate user location (near Empire State Building)
+      const mockUserLocation = {
+        latitude: 40.7484,
+        longitude: -73.9857
+      }
+      setUserLocation(mockUserLocation)
+      updatePOIStatus(mockUserLocation.latitude, mockUserLocation.longitude)
     }, 2000)
 
     const poiTimer = setTimeout(() => {
-      // Simulate detecting a nearby POI
-      setActivePOI(mockPOIs[0]) // Empire State Building
       setIsDetecting(false)
     }, 4000)
 
@@ -58,11 +133,35 @@ const HomeNew = () => {
     }
   }, [])
 
+  // Real-time location updates (simulated)
+  useEffect(() => {
+    if (!locationEnabled || !userLocation) return
+
+    const locationUpdateInterval = setInterval(() => {
+      // Simulate user movement
+      const newLat = userLocation.latitude + (Math.random() - 0.5) * 0.001
+      const newLon = userLocation.longitude + (Math.random() - 0.5) * 0.001
+      const newLocation = { latitude: newLat, longitude: newLon }
+      
+      setUserLocation(newLocation)
+      updatePOIStatus(newLat, newLon)
+    }, 5000) // Update every 5 seconds
+
+    return () => clearInterval(locationUpdateInterval)
+  }, [locationEnabled, userLocation])
+
   const handleStartTour = () => {
     if (!locationEnabled) {
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
-          () => setLocationEnabled(true),
+          (position) => {
+            setLocationEnabled(true)
+            setUserLocation({
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude
+            })
+            updatePOIStatus(position.coords.latitude, position.coords.longitude)
+          },
           () => console.log('Location permission denied')
         )
       }
@@ -95,56 +194,143 @@ const HomeNew = () => {
       return "Scanning for nearby landmarks..."
     } else if (activePOI) {
       return "Connect your headphones and start walking—World Tour will guide you."
+    } else if (closestPOI) {
+      return "Keep walking to start the tour"
     } else {
       return "World Tour will notify you when a landmark is nearby"
     }
   }
 
-  const POIDetectionCard = () => (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, ease: "easeOut" }}
-      className="w-full max-w-sm"
-    >
-      <Card 
-        className="cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] bg-white/80 backdrop-blur-sm border-white/30 shadow-lg"
-        onClick={handleStartTour}
-      >
-        <CardContent className="p-6">
-          <div className="text-center space-y-4">
-            {/* Detection Status */}
-            <div className="flex items-center justify-center space-x-2 mb-4">
-              <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-              <span className="text-gray-600 font-medium">Monitoring {monitoringCount} locations</span>
-            </div>
-            
-            {/* POI Information */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.3, duration: 0.5 }}
-              className="space-y-3"
-            >
-              <div className="flex items-center justify-center space-x-2">
-                <Navigation className="text-blue-500 w-5 h-5" />
-                <span className="text-blue-600 font-semibold text-lg">Nearby: {activePOI.title}</span>
+  const LocationStatusPanel = () => {
+    if (!locationEnabled) return null
+
+    if (isDetecting) {
+      return (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
+          className="w-full max-w-sm"
+        >
+          <Card className="bg-white/80 backdrop-blur-sm border-white/30 shadow-lg">
+            <CardContent className="p-6">
+              <div className="text-center space-y-4">
+                <div className="flex items-center justify-center space-x-2">
+                  <div className="w-3 h-3 bg-blue-500 rounded-full animate-pulse"></div>
+                  <span className="text-gray-600 font-medium">Scanning for landmarks...</span>
+                </div>
+                
+                <div className="flex items-center justify-center">
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                    className="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full"
+                  />
+                </div>
               </div>
-              
-              <p className="text-gray-600 text-sm leading-relaxed">
-                {activePOI.description}
-              </p>
-              
-              <div className="flex items-center justify-center space-x-2 pt-2">
-                <Volume2 className="text-blue-500 w-4 h-4" />
-                <span className="text-blue-500 text-sm font-medium">Tap to start tour</span>
+            </CardContent>
+          </Card>
+        </motion.div>
+      )
+    }
+
+    if (activePOI) {
+      return (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
+          className="w-full max-w-sm"
+        >
+          <Card 
+            className="cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] bg-white/80 backdrop-blur-sm border-white/30 shadow-lg"
+            onClick={handleStartTour}
+          >
+            <CardContent className="p-6">
+              <div className="text-center space-y-4">
+                {/* Detection Status */}
+                <div className="flex items-center justify-center space-x-2 mb-4">
+                  <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                  <span className="text-gray-600 font-medium">Monitoring {monitoringCount} locations</span>
+                </div>
+                
+                {/* POI Information */}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.3, duration: 0.5 }}
+                  className="space-y-3"
+                >
+                  <div className="flex items-center justify-center space-x-2">
+                    <Navigation className="text-blue-500 w-5 h-5" />
+                    <span className="text-blue-600 font-semibold text-lg">Nearby: {activePOI.title}</span>
+                  </div>
+                  
+                  <p className="text-gray-600 text-sm leading-relaxed">
+                    {activePOI.description}
+                  </p>
+                  
+                  <div className="flex items-center justify-center space-x-2 pt-2">
+                    <Volume2 className="text-blue-500 w-4 h-4" />
+                    <span className="text-blue-500 text-sm font-medium">Tap to start tour</span>
+                  </div>
+                </motion.div>
               </div>
-            </motion.div>
-          </div>
-        </CardContent>
-      </Card>
-    </motion.div>
-  )
+            </CardContent>
+          </Card>
+        </motion.div>
+      )
+    }
+
+    if (closestPOI) {
+      const distanceInFeet = metersToFeet(closestPOI.distance)
+      
+      return (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
+          className="w-full max-w-sm"
+        >
+          <Card className="bg-white/80 backdrop-blur-sm border-white/30 shadow-lg">
+            <CardContent className="p-6">
+              <div className="text-center space-y-4">
+                {/* Detection Status */}
+                <div className="flex items-center justify-center space-x-2 mb-4">
+                  <div className="w-3 h-3 bg-blue-500 rounded-full animate-pulse"></div>
+                  <span className="text-gray-600 font-medium">Monitoring {monitoringCount} locations</span>
+                </div>
+                
+                {/* Closest POI Information */}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.3, duration: 0.5 }}
+                  className="space-y-3"
+                >
+                  <div className="flex items-center justify-center space-x-2">
+                    <MapPin className="text-orange-500 w-5 h-5" />
+                    <span className="text-orange-600 font-semibold text-lg">Closest POI: {closestPOI.title}</span>
+                  </div>
+                  
+                  <p className="text-gray-600 text-sm font-medium">
+                    {distanceInFeet} ft away
+                  </p>
+                  
+                  <div className="flex items-center justify-center space-x-2 pt-2">
+                    <Navigation className="text-gray-500 w-4 h-4" />
+                    <span className="text-gray-500 text-sm font-medium">Keep walking to start the tour</span>
+                  </div>
+                </motion.div>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      )
+    }
+
+    return null
+  }
 
   const LocationRequestCard = () => (
     <motion.div
@@ -164,34 +350,6 @@ const HomeNew = () => {
             <p className="text-gray-500 text-sm">
               Enable location services to discover nearby landmarks and start your audio tour.
             </p>
-          </div>
-        </CardContent>
-      </Card>
-    </motion.div>
-  )
-
-  const DetectingCard = () => (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, ease: "easeOut" }}
-      className="w-full max-w-sm"
-    >
-      <Card className="bg-white/80 backdrop-blur-sm border-white/30 shadow-lg">
-        <CardContent className="p-6">
-          <div className="text-center space-y-4">
-            <div className="flex items-center justify-center space-x-2">
-              <div className="w-3 h-3 bg-blue-500 rounded-full animate-pulse"></div>
-              <span className="text-gray-600 font-medium">Scanning for landmarks...</span>
-            </div>
-            
-            <div className="flex items-center justify-center">
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                className="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full"
-              />
-            </div>
           </div>
         </CardContent>
       </Card>
@@ -254,11 +412,9 @@ const HomeNew = () => {
           <div className="w-full flex justify-center">
             {!locationEnabled ? (
               <LocationRequestCard />
-            ) : isDetecting ? (
-              <DetectingCard />
-            ) : activePOI ? (
-              <POIDetectionCard />
-            ) : null}
+            ) : (
+              <LocationStatusPanel />
+            )}
           </div>
 
           {/* Bottom Section */}
