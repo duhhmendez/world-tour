@@ -5,6 +5,7 @@ import Tours from './components/Tours'
 import About from './components/About'
 import HomeNew from './pages/HomeNew'
 import { Menu, X } from 'lucide-react'
+import { AuthProvider } from './contexts/AuthContext'
 
 
 function App() {
@@ -69,28 +70,30 @@ function App() {
   )
 
   return (
-    <Router>
-      <div className="min-h-screen bg-gray-50">
-        <Routes>
-          <Route path="/" element={
-            <div className="flex flex-col h-screen">
-              {/* Hamburger Menu Button */}
-              <MenuButton />
-              
-              {/* Menu Overlay */}
-              {showMenu && <MenuOverlay />}
+    <AuthProvider>
+      <Router>
+        <div className="min-h-screen bg-gray-50">
+          <Routes>
+            <Route path="/" element={
+              <div className="flex flex-col h-screen">
+                {/* Hamburger Menu Button */}
+                <MenuButton />
+                
+                {/* Menu Overlay */}
+                {showMenu && <MenuOverlay />}
 
-              {/* Main Content - iOS Style */}
-              <div className="flex-1 overflow-hidden">
-                {currentTab === 'home' && <HomeNew />}
-                {currentTab === 'past-tours' && <PastToursNew />}
+                {/* Main Content - iOS Style */}
+                <div className="flex-1 overflow-hidden">
+                  {currentTab === 'home' && <HomeNew />}
+                  {currentTab === 'past-tours' && <PastToursNew />}
+                </div>
               </div>
-            </div>
-          } />
-          <Route path="/about" element={<About />} />
-        </Routes>
-      </div>
-    </Router>
+            } />
+            <Route path="/about" element={<About />} />
+          </Routes>
+        </div>
+      </Router>
+    </AuthProvider>
   )
 }
 

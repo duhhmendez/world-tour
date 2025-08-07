@@ -10,7 +10,8 @@ import {
   MapPin
 } from 'lucide-react'
 import { Button } from '../components/ui/button'
-
+import { useAuth } from '../contexts/AuthContext'
+import { saveTourHistory } from '../lib/supabaseClient'
 
 const ActiveTourNew = ({ onEndTour, pois = [] }) => {
   const [isPlaying, setIsPlaying] = useState(false)
@@ -19,7 +20,9 @@ const ActiveTourNew = ({ onEndTour, pois = [] }) => {
   const [currentPOIIndex, setCurrentPOIIndex] = useState(0)
   const [isScrubbing, setIsScrubbing] = useState(false)
   const [scrubTime, setScrubTime] = useState(0)
+  const [savingTour, setSavingTour] = useState(false)
   const progressRef = useRef(null)
+  const { user, isAuthenticated } = useAuth()
 
   // Use POIs from props or fallback to empty array
   const currentLocationPOIs = pois.length > 0 ? pois.map(poi => ({
@@ -152,9 +155,31 @@ const ActiveTourNew = ({ onEndTour, pois = [] }) => {
     setIsScrubbing(false)
   }
 
-  const handleEndTour = () => {
+  const handleEndTour = async () => {
     // Stop any active TTS
     window.speechSynthesis.cancel()
+    
+    // Save tour history if user is authenticated
+    if (isAuthenticated && user && currentLocationPOIs.length > 0) {
+      setSavingTour(true)
+      try {
+        const tourData = {
+          poi_name: currentPOI.title,
+          location: currentPOI.location,
+          duration_seconds: Math.floor(currentTime),
+          transcript: currentPOI.description,
+          tour_title: `${currentPOI.title} Tour`
+        }
+        
+        await saveTourHistory(tourData)
+        console.log('Tour saved successfully')
+      } catch (error) {
+        console.error('Error saving tour:', error)
+      } finally {
+        setSavingTour(false)
+      }
+    }
+    
     onEndTour()
   }
 

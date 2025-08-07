@@ -13,16 +13,39 @@ import {
 } from 'lucide-react'
 import { Button } from '../components/ui/button'
 import { Card, CardContent } from '../components/ui/card'
-
+import { useAuth } from '../contexts/AuthContext'
+import { fetchTourHistory } from '../lib/supabaseClient'
+import Login from '../components/Login'
 
 const PastToursNew = () => {
     const [pastTours, setPastTours] = useState([])
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
   const [showLogin, setShowLogin] = useState(false)
+  const { user, isAuthenticated } = useAuth()
 
   const [selectedTour, setSelectedTour] = useState(null)
   const [showTranscript, setShowTranscript] = useState(false)
 
+  // Load tour history when user is authenticated
+  useEffect(() => {
+    const loadTourHistory = async () => {
+      if (isAuthenticated && user) {
+        setLoading(true)
+        try {
+          const tours = await fetchTourHistory(user.id)
+          setPastTours(tours)
+        } catch (error) {
+          console.error('Error loading tour history:', error)
+        } finally {
+          setLoading(false)
+        }
+      } else {
+        setLoading(false)
+      }
+    }
+
+    loadTourHistory()
+  }, [isAuthenticated, user])
 
 
   const formatDate = (dateString) => {
@@ -184,7 +207,7 @@ const PastToursNew = () => {
       transition={{ duration: 0.8, ease: "easeOut" }}
       className="flex flex-col items-center justify-center min-h-[60vh] text-center px-8"
     >
-      {false ? (
+      {!isAuthenticated ? (
         <>
           {/* Icon */}
           <motion.div
@@ -399,6 +422,8 @@ const PastToursNew = () => {
       {/* Transcript Modal */}
       <TranscriptModal />
 
+      {/* Login Modal */}
+      <Login isOpen={showLogin} onClose={() => setShowLogin(false)} />
 
     </div>
   )
