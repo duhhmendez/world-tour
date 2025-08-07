@@ -145,6 +145,27 @@ const HomeNew = () => {
     return distance <= (poi.radius || 50)
   }
 
+  // Count POIs within 1 mile radius
+  const getPOIsWithinOneMile = (userLat, userLon) => {
+    if (!userLat || !userLon || pois.length === 0) return 0
+    
+    const ONE_MILE_IN_METERS = 1609.34 // 1 mile in meters
+    let count = 0
+    
+    pois.forEach(poi => {
+      if (poi.Location && poi.Location.includes(',')) {
+        const [lat, lon] = poi.Location.split(',').map(coord => parseFloat(coord.trim()))
+        const distance = getDistanceInMeters(userLat, userLon, lat, lon)
+        
+        if (distance <= ONE_MILE_IN_METERS) {
+          count++
+        }
+      }
+    })
+    
+    return count
+  }
+
   // Update POI status based on user location
   const updatePOIStatus = (userLat, userLon) => {
     const closest = getClosestPOI(userLat, userLon)
@@ -415,7 +436,9 @@ const HomeNew = () => {
                 {/* Detection Status */}
                 <div className="flex items-center justify-center space-x-2 mb-4">
                   <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-                  <span className="text-gray-600 font-medium">Monitoring {pois.length} locations</span>
+                  <span className="text-gray-600 font-medium">
+                    Monitoring {userLocation ? getPOIsWithinOneMile(userLocation.latitude, userLocation.longitude) : 0} locations within 1 mile
+                  </span>
                 </div>
                 
                 {/* POI Information */}
@@ -465,7 +488,9 @@ const HomeNew = () => {
                 {/* Detection Status */}
                 <div className="flex items-center justify-center space-x-2 mb-4">
                   <div className="w-3 h-3 bg-blue-500 rounded-full animate-pulse"></div>
-                  <span className="text-gray-600 font-medium">Monitoring {pois.length} locations</span>
+                  <span className="text-gray-600 font-medium">
+                    Monitoring {userLocation ? getPOIsWithinOneMile(userLocation.latitude, userLocation.longitude) : 0} locations within 1 mile
+                  </span>
                 </div>
                 
                 {/* Closest POI Information */}
