@@ -437,7 +437,7 @@ const HomeNew = () => {
                 <div className="flex items-center justify-center space-x-2 mb-4">
                   <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
                   <span className="text-gray-600 font-medium">
-                    Monitoring {userLocation ? getPOIsWithinOneMile(userLocation.latitude, userLocation.longitude) : 0} locations within 1 mile
+                    Monitoring {userLocation ? getPOIsWithinOneMile(userLocation.latitude, userLocation.longitude) : 0} landmarks
                   </span>
                 </div>
                 
@@ -489,7 +489,7 @@ const HomeNew = () => {
                 <div className="flex items-center justify-center space-x-2 mb-4">
                   <div className="w-3 h-3 bg-blue-500 rounded-full animate-pulse"></div>
                   <span className="text-gray-600 font-medium">
-                    Monitoring {userLocation ? getPOIsWithinOneMile(userLocation.latitude, userLocation.longitude) : 0} locations within 1 mile
+                    Monitoring {userLocation ? getPOIsWithinOneMile(userLocation.latitude, userLocation.longitude) : 0} landmarks
                   </span>
                 </div>
                 
@@ -502,7 +502,7 @@ const HomeNew = () => {
                 >
                   <div className="flex items-center justify-center space-x-2">
                     <MapPin className="text-orange-500 w-5 h-5" />
-                    <span className="text-orange-600 font-semibold text-lg">Closest POI: {closestPOI.POI}</span>
+                    <span className="text-orange-600 font-semibold text-lg">Closest Landmark: {closestPOI.POI}</span>
                   </div>
                   
                   <p className="text-gray-600 text-sm font-medium">
@@ -544,7 +544,7 @@ const HomeNew = () => {
                 <div className="text-center space-y-4">
                   <div className="flex items-center justify-center space-x-2">
                     <MapPin className="text-gray-500 w-5 h-5" />
-                    <span className="text-gray-600 font-medium">Closest POI</span>
+                    <span className="text-gray-600 font-medium">Closest Landmark</span>
                   </div>
                   
                   <div className="space-y-2">
@@ -579,10 +579,10 @@ const HomeNew = () => {
               <div className="text-center space-y-4">
                 <div className="flex items-center justify-center space-x-2">
                   <MapPin className="text-gray-500 w-5 h-5" />
-                  <span className="text-gray-600 font-medium">No POIs Available</span>
+                  <span className="text-gray-600 font-medium">No Landmarks Available</span>
                 </div>
                 <p className="text-gray-500 text-sm">
-                  No points of interest are currently available in your area.
+                  No landmarks are currently available in your area.
                 </p>
               </div>
             </CardContent>
