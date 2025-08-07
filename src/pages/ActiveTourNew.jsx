@@ -11,6 +11,7 @@ import {
 } from 'lucide-react'
 import { Button } from '../components/ui/button'
 
+
 const ActiveTourNew = ({ onEndTour, pois = [] }) => {
   const [isPlaying, setIsPlaying] = useState(false)
   const [currentTime, setCurrentTime] = useState(0)
@@ -23,10 +24,10 @@ const ActiveTourNew = ({ onEndTour, pois = [] }) => {
   // Use POIs from props or fallback to empty array
   const currentLocationPOIs = pois.length > 0 ? pois.map(poi => ({
     id: poi.id,
-    title: poi.name,
-    description: poi.script,
+    title: poi.POI,
+    description: poi.Script,
     audioLength: 180, // Default audio length
-    location: poi.location || "Unknown Location"
+    location: poi.Location || "Unknown Location"
   })) : []
 
   const currentPOI = currentLocationPOIs[currentPOIIndex] || {
@@ -47,7 +48,7 @@ const ActiveTourNew = ({ onEndTour, pois = [] }) => {
     return `${mins}:${secs.toString().padStart(2, '0')}`
   }
 
-  // Simulate audio playback
+  // TTS Audio playback
   useEffect(() => {
     let interval
     if (isPlaying && currentTime < totalTime) {
@@ -56,6 +57,8 @@ const ActiveTourNew = ({ onEndTour, pois = [] }) => {
           const newTime = prev + 1
           if (newTime >= totalTime) {
             setIsPlaying(false)
+            // Stop TTS when audio finishes
+            window.speechSynthesis.cancel()
             return totalTime
           }
           return newTime
@@ -70,20 +73,53 @@ const ActiveTourNew = ({ onEndTour, pois = [] }) => {
     setTotalTime(currentPOI.audioLength)
     setCurrentTime(0)
     setIsPlaying(false)
+    // Stop any existing TTS when POI changes
+    window.speechSynthesis.cancel()
   }, [currentPOIIndex, currentPOI.audioLength])
 
+  // Cleanup TTS when component unmounts
+  useEffect(() => {
+    return () => {
+      window.speechSynthesis.cancel()
+    }
+  }, [])
+
   const handlePlayPause = () => {
-    setIsPlaying(!isPlaying)
+    if (!isPlaying) {
+      // Start TTS
+      window.speechSynthesis.cancel() // Cancel any existing speech
+      
+      const utterance = new SpeechSynthesisUtterance(currentPOI.description)
+      
+      // Set voice and rate for better sound
+      const voices = window.speechSynthesis.getVoices()
+      utterance.voice = voices.find(v => v.lang === 'en-US' && v.name.includes('Female')) || voices[0]
+      utterance.rate = 0.95 // slightly slower
+      
+      // Speak the script
+      window.speechSynthesis.speak(utterance)
+      setIsPlaying(true)
+    } else {
+      // Pause TTS
+      window.speechSynthesis.pause()
+      setIsPlaying(false)
+    }
   }
 
   const handlePrevious = () => {
     if (!isFirstPOI) {
+      // Stop current TTS
+      window.speechSynthesis.cancel()
+      setIsPlaying(false)
       setCurrentPOIIndex(prev => prev - 1)
     }
   }
 
   const handleNext = () => {
     if (!isLastPOI) {
+      // Stop current TTS
+      window.speechSynthesis.cancel()
+      setIsPlaying(false)
       setCurrentPOIIndex(prev => prev + 1)
     }
   }
@@ -117,6 +153,8 @@ const ActiveTourNew = ({ onEndTour, pois = [] }) => {
   }
 
   const handleEndTour = () => {
+    // Stop any active TTS
+    window.speechSynthesis.cancel()
     onEndTour()
   }
 

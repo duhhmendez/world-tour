@@ -5,7 +5,7 @@ import { Button } from '../components/ui/button'
 import { Card, CardContent } from '../components/ui/card'
 import ActiveTourNew from './ActiveTourNew'
 import SettingsNew from './SettingsNew'
-import { fetchPOIs } from '../lib/supabaseClient'
+import { fetchPOIs, supabase } from '../lib/supabaseClient'
 
 const HomeNew = () => {
   const [locationEnabled, setLocationEnabled] = useState(false)
@@ -28,12 +28,16 @@ const HomeNew = () => {
       try {
         setPoisLoading(true)
         setPoisError(null)
+        console.log('Attempting to load POIs from Supabase...')
+        
         const poisData = await fetchPOIs()
         console.log('POIs loaded from Supabase:', poisData)
-        setPois(poisData)
+        console.log('Number of POIs loaded:', poisData?.length || 0)
+
+        setPois(poisData || [])
       } catch (error) {
         console.error('Failed to load POIs:', error)
-        setPoisError('Failed to load points of interest')
+        setPoisError(`Failed to load points of interest: ${error.message}`)
       } finally {
         setPoisLoading(false)
       }
@@ -61,6 +65,16 @@ const HomeNew = () => {
   // Convert meters to feet
   const metersToFeet = (meters) => {
     return Math.round(meters * 3.281)
+  }
+
+  // Convert feet to miles when distance is over 1 mile
+  const formatDistance = (feet) => {
+    const MILE_IN_FEET = 5280
+    if (feet >= MILE_IN_FEET) {
+      const miles = (feet / MILE_IN_FEET).toFixed(1)
+      return `${miles} mi`
+    }
+    return `${feet} ft`
   }
 
   // Calculate direction between two points
@@ -91,18 +105,18 @@ const HomeNew = () => {
     let minDistance = Infinity
 
     pois.forEach(poi => {
-      // Parse coordinates from the location field
-      // Assuming location field contains "latitude,longitude" format
+      // Parse coordinates from the Location field
+      // Assuming Location field contains "latitude,longitude" format
       let poiLat, poiLon
       
-      if (poi.location && poi.location.includes(',')) {
-        const [lat, lon] = poi.location.split(',').map(coord => parseFloat(coord.trim()))
+      if (poi.Location && poi.Location.includes(',')) {
+        const [lat, lon] = poi.Location.split(',').map(coord => parseFloat(coord.trim()))
         poiLat = lat
         poiLon = lon
-        console.log(`POI "${poi.name}" coordinates:`, { lat: poiLat, lon: poiLon, location: poi.location })
+
       } else {
         // Skip POIs without valid coordinates
-        console.log(`POI "${poi.name}" has invalid location format:`, poi.location)
+
         return
       }
 
@@ -413,11 +427,11 @@ const HomeNew = () => {
                 >
                   <div className="flex items-center justify-center space-x-2">
                     <Navigation className="text-blue-500 w-5 h-5" />
-                    <span className="text-blue-600 font-semibold text-lg">Nearby: {activePOI.name}</span>
+                    <span className="text-blue-600 font-semibold text-lg">Nearby: {activePOI.POI}</span>
                   </div>
                   
                   <p className="text-gray-600 text-sm leading-relaxed">
-                    {activePOI.script}
+                    {activePOI.Script}
                   </p>
                   
                   <div className="flex items-center justify-center space-x-2 pt-2">
@@ -435,6 +449,7 @@ const HomeNew = () => {
     // Show closest POI if out of range
     if (closestPOI) {
       const distanceInFeet = metersToFeet(closestPOI.distance)
+      const formattedDistance = formatDistance(distanceInFeet)
       const direction = closestPOI.direction
       
       return (
@@ -462,11 +477,11 @@ const HomeNew = () => {
                 >
                   <div className="flex items-center justify-center space-x-2">
                     <MapPin className="text-orange-500 w-5 h-5" />
-                    <span className="text-orange-600 font-semibold text-lg">Closest POI: {closestPOI.name}</span>
+                    <span className="text-orange-600 font-semibold text-lg">Closest POI: {closestPOI.POI}</span>
                   </div>
                   
                   <p className="text-gray-600 text-sm font-medium">
-                    {distanceInFeet} ft away, {direction}
+                    {formattedDistance} away, {direction}
                   </p>
                   
                   <div className="flex items-center justify-center space-x-2 pt-2">
@@ -482,12 +497,14 @@ const HomeNew = () => {
     }
 
     // Show no POIs available state
+    console.log('POIs state:', { pois: pois.length, poisLoading, poisError })
     if (pois.length === 0 && !poisLoading && !poisError) {
       // Try to get closest POI even if none are in range
       const closestPOI = userLocation ? getClosestPOI(userLocation.latitude, userLocation.longitude) : null
       
       if (closestPOI) {
         const distanceInFeet = metersToFeet(closestPOI.distance)
+        const formattedDistance = formatDistance(distanceInFeet)
         const direction = closestPOI.direction
         
         return (
@@ -507,10 +524,10 @@ const HomeNew = () => {
                   
                   <div className="space-y-2">
                     <h3 className="text-lg font-semibold text-gray-800">
-                      {closestPOI.name}
+                      {closestPOI.POI}
                     </h3>
                     <p className="text-gray-600 text-sm font-medium">
-                      {distanceInFeet} ft away, {direction}
+                      {formattedDistance} away, {direction}
                     </p>
                   </div>
                   
@@ -578,6 +595,8 @@ const HomeNew = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-100/20 via-blue-50/10 to-orange-100/10">
+
+      
       <div className="flex flex-col h-screen">
         {/* Settings Button */}
         <motion.button

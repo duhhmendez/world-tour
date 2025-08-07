@@ -6,6 +6,7 @@ import About from './components/About'
 import HomeNew from './pages/HomeNew'
 import { Menu, X } from 'lucide-react'
 
+
 function App() {
   const [currentTab, setCurrentTab] = useState('home')
   const [showMenu, setShowMenu] = useState(false)
