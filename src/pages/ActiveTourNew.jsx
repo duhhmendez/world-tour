@@ -11,6 +11,7 @@ import {
 } from 'lucide-react'
 import { Button } from '../components/ui/button'
 import { useAuth } from '../contexts/AuthContext'
+import { useSettings } from '../contexts/SettingsContext'
 import { saveTourHistory } from '../lib/supabaseClient'
 
 const ActiveTourNew = ({ onEndTour, pois = [] }) => {
@@ -23,6 +24,7 @@ const ActiveTourNew = ({ onEndTour, pois = [] }) => {
   const [savingTour, setSavingTour] = useState(false)
   const progressRef = useRef(null)
   const { user, isAuthenticated } = useAuth()
+  const { voiceGender, voiceTone } = useSettings()
 
   // Use POIs from props or fallback to empty array
   const currentLocationPOIs = pois.length > 0 ? pois.map(poi => ({
@@ -94,10 +96,30 @@ const ActiveTourNew = ({ onEndTour, pois = [] }) => {
       
       const utterance = new SpeechSynthesisUtterance(currentPOI.description)
       
-      // Set voice and rate for better sound
+      // Set voice based on settings
       const voices = window.speechSynthesis.getVoices()
-      utterance.voice = voices.find(v => v.lang === 'en-US' && v.name.includes('Female')) || voices[0]
-      utterance.rate = 0.95 // slightly slower
+      let selectedVoice = voices[0] // fallback
+      
+      // Filter voices based on gender setting
+      if (voiceGender === 'female') {
+        selectedVoice = voices.find(v => v.lang === 'en-US' && v.name.includes('Female')) || voices[0]
+      } else if (voiceGender === 'male') {
+        selectedVoice = voices.find(v => v.lang === 'en-US' && v.name.includes('Male')) || voices[0]
+      } else {
+        // neutral - use default or first available
+        selectedVoice = voices.find(v => v.lang === 'en-US') || voices[0]
+      }
+      
+      utterance.voice = selectedVoice
+      
+      // Adjust rate based on tone setting
+      if (voiceTone === 'dramatic') {
+        utterance.rate = 0.85 // slower for dramatic effect
+      } else if (voiceTone === 'narrative') {
+        utterance.rate = 0.95 // slightly slower for narrative
+      } else {
+        utterance.rate = 1.0 // normal speed for friendly
+      }
       
       // Speak the script
       window.speechSynthesis.speak(utterance)

@@ -1,16 +1,23 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Mic, Volume2, WifiOff, Info, Globe } from 'lucide-react'
 import { Button } from '../components/ui/button'
 import { Switch } from '../components/ui/switch'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select'
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
+import { useSettings } from '../contexts/SettingsContext'
 
 const SettingsNew = ({ onClose }) => {
-  const [voiceGender, setVoiceGender] = useState('neutral')
-  const [voiceTone, setVoiceTone] = useState('friendly')
-  const [backgroundAmbience, setBackgroundAmbience] = useState(true)
-  const [offlineMode, setOfflineMode] = useState(false)
+  const {
+    voiceGender,
+    setVoiceGender,
+    voiceTone,
+    setVoiceTone,
+    backgroundAmbience,
+    setBackgroundAmbience,
+    offlineMode,
+    setOfflineMode
+  } = useSettings()
 
   const handleClose = () => {
     onClose()

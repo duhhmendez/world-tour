@@ -6,6 +6,7 @@ import About from './components/About'
 import HomeNew from './pages/HomeNew'
 import { Menu, X } from 'lucide-react'
 import { AuthProvider } from './contexts/AuthContext'
+import { SettingsProvider } from './contexts/SettingsContext'
 
 
 function App() {
@@ -71,8 +72,9 @@ function App() {
 
   return (
     <AuthProvider>
-      <Router>
-        <div className="min-h-screen bg-gray-50">
+      <SettingsProvider>
+        <Router>
+          <div className="min-h-screen bg-gray-50">
           <Routes>
             <Route path="/" element={
               <div className="flex flex-col h-screen">
@@ -93,6 +95,7 @@ function App() {
           </Routes>
         </div>
       </Router>
+      </SettingsProvider>
     </AuthProvider>
   )
 }
