@@ -683,25 +683,6 @@ const HomeNew = () => {
 
           {/* Bottom Section */}
           <div className="w-full max-w-sm space-y-8">
-            {/* Start Tour Button - Only show when location enabled but no POI */}
-            {locationEnabled && !isDetecting && !activePOI && !poisLoading && !poisError && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, ease: "easeOut", delay: 0.2 }}
-              >
-                <Button
-                  onClick={handleStartTour}
-                  variant="ios"
-                  size="lg"
-                  className="w-full flex items-center justify-center space-x-3 bg-blue-500 hover:bg-blue-600 text-white"
-                >
-                  <Volume2 className="text-xl" />
-                  <span className="text-lg font-semibold">Start Tour</span>
-                </Button>
-              </motion.div>
-            )}
-
             {/* Subtitle Text */}
             <motion.p
               initial={{ opacity: 0 }}
