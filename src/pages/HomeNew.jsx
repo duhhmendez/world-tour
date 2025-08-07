@@ -619,7 +619,7 @@ const HomeNew = () => {
   )
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-100/20 via-blue-50/10 to-orange-100/10">
+    <div className="min-h-screen bg-gradient-to-br from-blue-100/40 via-blue-50/30 to-orange-100/30">
 
       
       <div className="flex flex-col h-screen">
@@ -646,19 +646,16 @@ const HomeNew = () => {
             {/* Globe Icon */}
             <motion.div
               animate={{ 
-                scale: [1, 1.05, 1],
-                rotate: [0, 5, -5, 0]
+                scale: [1, 1.1, 1]
               }}
               transition={{
-                duration: 4,
+                duration: 2,
                 repeat: Infinity,
                 ease: "easeInOut"
               }}
               className="flex justify-center"
             >
-              <div className="w-24 h-24 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center shadow-2xl border border-white/30">
-                <div className="text-5xl">🌍</div>
-              </div>
+              <Globe className="w-24 h-24 text-blue-500" />
             </motion.div>
 
             {/* Title */}
