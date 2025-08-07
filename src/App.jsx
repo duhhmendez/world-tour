@@ -85,7 +85,7 @@ function App() {
                 {/* Main Content - iOS Style */}
                 <div className="flex-1 overflow-hidden">
                   {currentTab === 'home' && <HomeNew />}
-                  {currentTab === 'past-tours' && <PastToursNew />}
+                  {currentTab === 'past-tours' && <PastToursNew onNavigateHome={() => handleTabChange('home')} />}
                 </div>
               </div>
             } />

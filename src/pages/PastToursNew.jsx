@@ -17,7 +17,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { fetchTourHistory } from '../lib/supabaseClient'
 import Login from '../components/Login'
 
-const PastToursNew = () => {
+const PastToursNew = ({ onNavigateHome }) => {
     const [pastTours, setPastTours] = useState([])
   const [loading, setLoading] = useState(true)
   const [showLogin, setShowLogin] = useState(false)
@@ -46,6 +46,14 @@ const PastToursNew = () => {
 
     loadTourHistory()
   }, [isAuthenticated, user])
+
+  // Handle login modal close - navigate back to home
+  const handleLoginClose = () => {
+    setShowLogin(false)
+    if (onNavigateHome) {
+      onNavigateHome()
+    }
+  }
 
 
   const formatDate = (dateString) => {
@@ -423,7 +431,7 @@ const PastToursNew = () => {
       <TranscriptModal />
 
       {/* Login Modal */}
-      <Login isOpen={showLogin} onClose={() => setShowLogin(false)} />
+      <Login isOpen={showLogin} onClose={handleLoginClose} />
 
     </div>
   )
